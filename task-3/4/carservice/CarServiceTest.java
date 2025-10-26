@@ -22,8 +22,7 @@ public class CarServiceTest {
         for (int i = 0; i < 5; i++) {
             garage.createSpot(i + 1);
         }
-        GarageSpot spot = garage.createSpot(5);
-        garage.removeSpot(spot.getNumber());
+        garage.removeSpot(5);
         garage.createSpot(5);
 
         // Добавление, удаление мастеров
