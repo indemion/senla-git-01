@@ -1,7 +1,9 @@
+package carservice.garage;
+
 public class GarageSpot {
     private final int number;
 
-    public GarageSpot(int number) {
+    GarageSpot(int number) {
         this.number = number;
     }
 

@@ -6,5 +6,5 @@ public class PenAssemblyLineTesting {
         Pen pen = new Pen();
         penAssemblyLine.assembleProduct(pen);
         System.out.println("Pen assembly completed");
-    }    
+    }
 }

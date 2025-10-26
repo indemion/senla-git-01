@@ -7,7 +7,10 @@ public class SumOfDigits {
 
     public static void main(String[] args) {
         Random random = new Random();
-        int originalRandomNumber = random.nextInt(MIN_VALUE, MAX_VALUE + 1);
+//        int originalRandomNumber = random.nextInt(MIN_VALUE, MAX_VALUE + 1);
+        // Так и не понял зачем использовать такую конструкцию в задании, если есть указанная выше, где сразу можно
+        // задавать интервал для случайного числа.
+        int originalRandomNumber = random.nextInt(900) + 100;
 
         int number = originalRandomNumber;
         int sum = 0;
