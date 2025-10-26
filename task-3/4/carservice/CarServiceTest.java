@@ -1,7 +1,6 @@
 package carservice;
 
 import carservice.garage.Garage;
-import carservice.garage.GarageSpot;
 import carservice.master.Master;
 import carservice.master.MasterManager;
 import carservice.order.Order;
