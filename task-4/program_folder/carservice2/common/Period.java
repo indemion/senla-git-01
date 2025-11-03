@@ -1,0 +1,51 @@
+package carservice2.common;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+public class Period {
+    private LocalDateTime start;
+    private LocalDateTime end;
+
+    public Period() {}
+
+    public Period(LocalDateTime start, LocalDateTime end) {
+        if (start.isAfter(end)) throw new IllegalArgumentException(start + " after " + end);
+        this.start = start;
+        this.end = end;
+    }
+
+    public LocalDateTime getStart() {
+        return start;
+    }
+
+    public void setStart(LocalDateTime start) {
+        this.start = start;
+    }
+
+    public LocalDateTime getEnd() {
+        return end;
+    }
+
+    public void setEnd(LocalDateTime end) throws IllegalArgumentException {
+        if (start.isAfter(end)) throw new IllegalArgumentException(start + " after " + end);
+        this.end = end;
+    }
+
+    public void shift(Duration duration) {
+        start = start.plus(duration);
+        end = end.plus(duration);
+    }
+
+    public boolean isOverlap(Period period) {
+        return !(end.isBefore(period.getStart()) || start.isAfter(period.getEnd()));
+    }
+
+    @Override
+    public String toString() {
+        String startString = start == null ? null : start.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"));
+        String endString = end == null ? null : end.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"));
+        return "Period{start=" + startString + ", end=" + endString + "}";
+    }
+}
