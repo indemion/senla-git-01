@@ -1,6 +1,6 @@
 package carservice5.ui;
 
-import carservice5.common.OperationProhibitedException;
+import carservice5.exceptions.OperationProhibitedException;
 
 public class Navigator {
     private Menu currentMenu;

@@ -1,9 +1,9 @@
 package carservice5.models.garage;
 
-import carservice5.App;
-import carservice5.common.OperationProhibitedException;
+import carservice5.Config;
 import carservice5.common.OperationProhibitedMessages;
 import carservice5.common.Period;
+import carservice5.exceptions.OperationProhibitedException;
 import carservice5.models.master.MasterService;
 import carservice5.models.order.Order;
 import carservice5.models.order.OrderService;
@@ -52,7 +52,7 @@ public class GarageSpotService {
     }
 
     public void delete(int id) {
-        if (!App.instance().getBooleanProperty("garageSpot.removing")) {
+        if (!Config.instance().getBooleanProperty("garageSpot.removing")) {
             throw new OperationProhibitedException(OperationProhibitedMessages.GARAGE_SPOT_REMOVING);
         }
 

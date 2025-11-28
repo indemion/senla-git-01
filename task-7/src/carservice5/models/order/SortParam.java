@@ -1,7 +1,6 @@
 package carservice5.models.order;
 
 import carservice5.common.SortDirection;
-import carservice5.models.order.SortCriteria;
 
 public class SortParam {
     private final SortCriteria sortCriteria;

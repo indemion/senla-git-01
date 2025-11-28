@@ -1,5 +1,7 @@
 package carservice5.models.order;
 
+import carservice5.models.garage.GarageSpotRepository;
+import carservice5.models.master.MasterRepository;
 import carservice5.models.repositories.InMemoryRepository;
 
 public class OrderRepository extends InMemoryRepository<Order> {
@@ -14,5 +16,16 @@ public class OrderRepository extends InMemoryRepository<Order> {
         }
 
         return instance;
+    }
+
+    public static void setInstance(OrderRepository instance) {
+        OrderRepository.instance = instance;
+    }
+
+    public void restoreReferences(MasterRepository masterRepository, GarageSpotRepository garageSpotRepository) {
+        inMemoryDB.forEach((integer, order) -> {
+            masterRepository.findById(order.getMasterId()).ifPresent(order::setMaster);
+            garageSpotRepository.findById(order.getGarageSpotId()).ifPresent(order::setGarageSpot);
+        });
     }
 }

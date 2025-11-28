@@ -1,7 +1,5 @@
 package carservice5.ui;
 
-import carservice5.ui.IAction;
-
 public class MenuItem {
     private final String title;
     private final IAction action;

@@ -1,4 +1,4 @@
-package carservice5.common;
+package carservice5.exceptions;
 
 public class InvalidCsvFileException extends RuntimeException {
     public InvalidCsvFileException(String message) {

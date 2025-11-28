@@ -2,6 +2,7 @@ package carservice5.models.repositories;
 
 import carservice5.models.IHasId;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public abstract class InMemoryRepository<T extends IHasId> implements IRepository<T> {
+public abstract class InMemoryRepository<T extends IHasId> implements IRepository<T>, Serializable {
     protected Map<Integer, T> inMemoryDB = new ConcurrentHashMap<>();
 
     @Override

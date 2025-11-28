@@ -4,6 +4,8 @@ import carservice5.ui.MenuBuilder;
 import carservice5.ui.Navigator;
 import carservice5.ui.ScannerDecorator;
 
+import java.util.Scanner;
+
 public class ConsoleController {
     private static ConsoleController instance;
 
@@ -20,10 +22,14 @@ public class ConsoleController {
 
     public void run() {
         Navigator navigator = new Navigator(new MenuBuilder().buildRootMenu());
-        while (true) {
-            navigator.printMenu();
-            System.out.print("Введите номер меню: ");
-            navigator.navigate(ScannerDecorator.instance().nextInt());
+        try(Scanner scanner = new Scanner(System.in)) {
+            ScannerDecorator.instance().setScanner(scanner);
+            while (true) {
+                navigator.printMenu();
+                System.out.print("Введите номер меню: ");
+                // TODO: разобраться почему сканнер кидает ошибку при завершении программы комбинацией CTRL+C
+                navigator.navigate(ScannerDecorator.instance().nextInt());
+            }
         }
     }
 }

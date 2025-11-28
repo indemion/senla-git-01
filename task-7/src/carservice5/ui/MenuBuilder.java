@@ -1,5 +1,6 @@
 package carservice5.ui;
 
+import carservice5.ui.controllers.ExitAction;
 import carservice5.ui.controllers.GarageSpotController;
 import carservice5.ui.controllers.MasterController;
 import carservice5.ui.controllers.OrderController;
@@ -18,6 +19,7 @@ public class MenuBuilder {
         menuItems.add(new MenuItem("Мастера", masterController::index, buildMastersMenu(menu)));
         menuItems.add(new MenuItem("Гаражные места", garageSpotController::index, buildGarageSpotsMenu(menu)));
         menuItems.add(new MenuItem("Заказы", orderController::index, buildOrdersMenu(menu)));
+        menuItems.add(new MenuItem("Выход", new ExitAction()));
         menu.addMenuItems(menuItems);
         return menu;
     }

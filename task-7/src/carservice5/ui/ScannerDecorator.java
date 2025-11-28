@@ -4,10 +4,9 @@ import java.util.Scanner;
 
 public class ScannerDecorator {
     private static ScannerDecorator instance;
-    private final Scanner scanner = new Scanner(System.in);
+    private Scanner scanner;
 
-    private ScannerDecorator() {
-    }
+    private ScannerDecorator() {}
 
     public static ScannerDecorator instance() {
         if (instance == null) {
@@ -15,6 +14,10 @@ public class ScannerDecorator {
         }
 
         return instance;
+    }
+
+    public void setScanner(Scanner scanner) {
+        this.scanner = scanner;
     }
 
     public String nextLine() {

@@ -1,10 +1,10 @@
 package carservice5.ui.controllers;
 
-import carservice5.App;
-import carservice5.common.OperationProhibitedException;
+import carservice5.Config;
 import carservice5.common.OperationProhibitedMessages;
 import carservice5.common.Period;
 import carservice5.common.SortDirection;
+import carservice5.exceptions.OperationProhibitedException;
 import carservice5.models.garage.GarageSpot;
 import carservice5.models.garage.GarageSpotService;
 import carservice5.models.master.Master;
@@ -103,7 +103,7 @@ public class OrderController {
     }
 
     public void delete() {
-        if (!App.instance().getBooleanProperty("order.removing")) {
+        if (!Config.instance().getBooleanProperty("order.removing")) {
             throw new OperationProhibitedException(OperationProhibitedMessages.ORDER_REMOVING);
         }
         System.out.print("Введите id заказа, который хотитет удалить: ");
@@ -134,7 +134,7 @@ public class OrderController {
     }
 
     public void shiftOrdersEstimatedWorkPeriod() {
-        if (!App.instance().getBooleanProperty("order.shiftingEstimatedWorkPeriod")) {
+        if (!Config.instance().getBooleanProperty("order.shiftingEstimatedWorkPeriod")) {
             throw new OperationProhibitedException(OperationProhibitedMessages.ORDER_SHIFTING_ESTIMATED_WORK_PERIOD);
         }
         System.out.print("Введите кол-во часов на которое необходимо сместить все заказы: ");

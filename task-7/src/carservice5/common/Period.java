@@ -1,11 +1,12 @@
 package carservice5.common;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
-public class Period {
+public class Period implements Serializable {
     private LocalDateTime start;
     private LocalDateTime end;
 

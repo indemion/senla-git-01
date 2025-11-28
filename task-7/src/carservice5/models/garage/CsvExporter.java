@@ -1,7 +1,6 @@
 package carservice5.models.garage;
 
 import carservice5.common.AbstractCsvExporter;
-import carservice5.models.garage.GarageSpot;
 
 public class CsvExporter extends AbstractCsvExporter<GarageSpot> {
     @Override

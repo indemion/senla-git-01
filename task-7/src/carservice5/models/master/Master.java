@@ -1,14 +1,14 @@
 package carservice5.models.master;
 
 import carservice5.models.Entity;
-import carservice5.models.master.MasterStatus;
 import carservice5.models.order.Order;
 
 public class Master extends Entity {
     private final String firstname;
     private final String lastname;
     private MasterStatus status;
-    private Order orderAtWork;
+    private Integer orderAtWorkId;
+    private transient Order orderAtWork;
 
     public Master(int id, String firstname, String lastname) {
         super(id);
@@ -22,6 +22,7 @@ public class Master extends Entity {
         this.firstname = firstname;
         this.lastname = lastname;
         this.status = status;
+        this.orderAtWorkId = orderAtWork.getId();
         this.orderAtWork = orderAtWork;
     }
 
@@ -41,13 +42,18 @@ public class Master extends Entity {
         return status;
     }
 
+    public Integer getOrderAtWorkId() {
+        return orderAtWorkId;
+    }
+
     public Order getOrderAtWork() {
         return orderAtWork;
     }
 
     public void setOrderAtWork(Order orderAtWork) {
-        this.status = orderAtWork == null ? MasterStatus.FREE : MasterStatus.BUSY;
         this.orderAtWork = orderAtWork;
+        this.orderAtWorkId = orderAtWork == null ? null : orderAtWork.getId();
+        this.status = orderAtWork == null ? MasterStatus.FREE : MasterStatus.BUSY;
     }
 
     public boolean isBusy() {

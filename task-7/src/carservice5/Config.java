@@ -4,23 +4,23 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
 
-public class App {
-    private static App instance;
+public class Config {
+    private static Config instance;
     private final Properties properties = new Properties();
 
-    private App() {
+    private Config() {
         loadProperties();
     }
 
-    public static App instance() {
+    public static Config instance() {
         if (instance == null) {
-            instance = new App();
+            instance = new Config();
         }
         return instance;
     }
 
     private void loadProperties() {
-        try (FileReader propertiesReader = new FileReader("task-7/src/carservice5/config.properties")) {
+        try (FileReader propertiesReader = new FileReader("./config.properties")) {
             properties.load(propertiesReader);
         } catch (IOException e) {
             throw new RuntimeException(e);

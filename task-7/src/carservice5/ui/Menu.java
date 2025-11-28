@@ -1,7 +1,5 @@
 package carservice5.ui;
 
-import carservice5.ui.MenuItem;
-
 import java.util.ArrayList;
 import java.util.List;
 

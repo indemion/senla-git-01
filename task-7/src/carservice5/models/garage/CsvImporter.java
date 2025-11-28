@@ -1,7 +1,6 @@
 package carservice5.models.garage;
 
 import carservice5.common.AbstractCsvImporter;
-import carservice5.models.garage.GarageSpot;
 import carservice5.models.order.Order;
 import carservice5.models.order.OrderService;
 

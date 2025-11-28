@@ -4,7 +4,6 @@ import carservice5.common.Period;
 import carservice5.models.Entity;
 import carservice5.models.garage.GarageSpot;
 import carservice5.models.master.Master;
-import carservice5.models.order.OrderStatus;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -13,8 +12,10 @@ import java.time.format.DateTimeFormatter;
 public class Order extends Entity {
     // price в минимальной единице валюты, т.е. в копейках
     private final int price;
-    private final Master master;
-    private final GarageSpot garageSpot;
+    private final int masterId;
+    private transient Master master;
+    private final int garageSpotId;
+    private transient GarageSpot garageSpot;
     private OrderStatus status;
     private final Period estimatedWorkPeriod;
     private final Period actualWorkPeriod;
@@ -26,7 +27,9 @@ public class Order extends Entity {
     public Order(int id, int price, Master master, GarageSpot garageSpot, Period estimatedWorkPeriod) {
         super(id);
         this.price = price;
+        this.masterId = master.getId();
         this.master = master;
+        this.garageSpotId = garageSpot.getId();
         this.garageSpot = garageSpot;
         this.status = OrderStatus.CREATED;
         this.estimatedWorkPeriod = estimatedWorkPeriod;
@@ -40,7 +43,9 @@ public class Order extends Entity {
         super(id);
         this.price = price;
         this.status = status;
+        this.masterId = master.getId();
         this.master = master;
+        this.garageSpotId = garageSpot.getId();
         this.garageSpot = garageSpot;
         this.estimatedWorkPeriod = estimatedWorkPeriod;
         this.actualWorkPeriod = actualWorkPeriod;
@@ -54,8 +59,32 @@ public class Order extends Entity {
         return price;
     }
 
+    public int getMasterId() {
+        return masterId;
+    }
+
     public Master getMaster() {
         return master;
+    }
+
+    public void setMaster(Master master) {
+        if (master.getId() != masterId) {
+            // TODO: возможно стоит бросать исключение
+            return;
+        }
+        this.master = master;
+    }
+
+    public int getGarageSpotId() {
+        return garageSpotId;
+    }
+
+    public void setGarageSpot(GarageSpot garageSpot) {
+        if (garageSpot.getId() != garageSpotId) {
+            // TODO: возможно стоит бросать исключение
+            return;
+        }
+        this.garageSpot = garageSpot;
     }
 
     public OrderStatus getStatus() {

@@ -6,7 +6,8 @@ import carservice5.models.order.Order;
 public class GarageSpot extends Entity {
     private final int number;
     private GarageSpotStatus status;
-    private Order orderAtWork;
+    private Integer orderAtWorkId;
+    private transient Order orderAtWork;
 
     GarageSpot(int id, int number) {
         super(id);
@@ -18,6 +19,7 @@ public class GarageSpot extends Entity {
         super(id);
         this.number = number;
         this.status = status;
+        this.orderAtWorkId = orderAtWork.getId();
         this.orderAtWork = orderAtWork;
     }
 
@@ -29,9 +31,14 @@ public class GarageSpot extends Entity {
         return status;
     }
 
+    public Integer getOrderAtWorkId() {
+        return orderAtWorkId;
+    }
+
     public void setOrderAtWork(Order orderAtWork) {
         this.orderAtWork = orderAtWork;
-        status = orderAtWork == null ? GarageSpotStatus.FREE : GarageSpotStatus.OCCUPIED;
+        this.orderAtWorkId = orderAtWork == null ? null : orderAtWork.getId();
+        this.status = orderAtWork == null ? GarageSpotStatus.FREE : GarageSpotStatus.OCCUPIED;
     }
 
     public Order getOrderAtWork() {

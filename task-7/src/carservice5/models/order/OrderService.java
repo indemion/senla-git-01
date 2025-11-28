@@ -1,9 +1,9 @@
 package carservice5.models.order;
 
-import carservice5.App;
-import carservice5.common.OperationProhibitedException;
+import carservice5.Config;
 import carservice5.common.OperationProhibitedMessages;
 import carservice5.common.Period;
+import carservice5.exceptions.OperationProhibitedException;
 import carservice5.models.garage.GarageSpot;
 import carservice5.models.master.Master;
 import carservice5.models.repositories.IRepository;
@@ -54,7 +54,7 @@ public class OrderService {
     }
 
     public void softDelete(int id) {
-        if (!App.instance().getBooleanProperty("order.removing")) {
+        if (!Config.instance().getBooleanProperty("order.removing")) {
             throw new OperationProhibitedException(OperationProhibitedMessages.ORDER_REMOVING);
         }
         delete(id, true);
@@ -76,7 +76,7 @@ public class OrderService {
     }
 
     public void shiftEstimatedWorkPeriodInCreatedOrders(Duration duration) {
-        if (!App.instance().getBooleanProperty("order.shiftingEstimatedWorkPeriod")) {
+        if (!Config.instance().getBooleanProperty("order.shiftingEstimatedWorkPeriod")) {
             throw new OperationProhibitedException(OperationProhibitedMessages.ORDER_SHIFTING_ESTIMATED_WORK_PERIOD);
         }
         for (Order order : orderRepository.findAll()) {

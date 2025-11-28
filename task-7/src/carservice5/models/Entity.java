@@ -1,6 +1,8 @@
 package carservice5.models;
 
-public abstract class Entity implements IHasId {
+import java.io.Serializable;
+
+public abstract class Entity implements IHasId, Serializable {
     protected int id;
 
     public Entity(int id) {

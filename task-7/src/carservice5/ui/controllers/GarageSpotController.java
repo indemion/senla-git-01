@@ -1,8 +1,8 @@
 package carservice5.ui.controllers;
 
-import carservice5.App;
-import carservice5.common.OperationProhibitedException;
+import carservice5.Config;
 import carservice5.common.OperationProhibitedMessages;
+import carservice5.exceptions.OperationProhibitedException;
 import carservice5.models.garage.CsvExporter;
 import carservice5.models.garage.GarageSpotService;
 import carservice5.models.garage.GarageSpotStatus;
@@ -43,7 +43,7 @@ public class GarageSpotController {
     }
 
     public void delete() {
-        if (!App.instance().getBooleanProperty("garageSpot.removing")) {
+        if (!Config.instance().getBooleanProperty("garageSpot.removing")) {
             throw new OperationProhibitedException(OperationProhibitedMessages.GARAGE_SPOT_REMOVING);
         }
         System.out.print("Введите номер гаражного места: ");

@@ -1,7 +1,7 @@
 package carservice5.models.master;
 
-import carservice5.common.EntityNotFoundException;
 import carservice5.common.Period;
+import carservice5.exceptions.EntityNotFoundException;
 import carservice5.models.order.Order;
 import carservice5.models.order.OrderService;
 

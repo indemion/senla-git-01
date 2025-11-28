@@ -1,7 +1,6 @@
 package carservice5.models.order;
 
 import carservice5.common.AbstractCsvExporter;
-import carservice5.models.order.Order;
 
 public class CsvExporter extends AbstractCsvExporter<Order> {
     @Override

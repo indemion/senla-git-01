@@ -1,8 +1,6 @@
 package carservice5.models.master;
 
 import carservice5.common.SortDirection;
-import carservice5.models.master.Master;
-import carservice5.models.master.MasterStatus;
 
 import java.util.Comparator;
 import java.util.List;

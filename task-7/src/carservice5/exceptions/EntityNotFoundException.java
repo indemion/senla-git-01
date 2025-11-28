@@ -1,4 +1,4 @@
-package carservice5.common;
+package carservice5.exceptions;
 
 public class EntityNotFoundException extends RuntimeException {
     public EntityNotFoundException(String message) {

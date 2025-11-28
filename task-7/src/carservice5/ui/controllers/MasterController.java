@@ -1,7 +1,7 @@
 package carservice5.ui.controllers;
 
-import carservice5.common.EntityNotFoundException;
 import carservice5.common.SortDirection;
+import carservice5.exceptions.EntityNotFoundException;
 import carservice5.models.master.*;
 import carservice5.ui.ScannerDecorator;
 import carservice5.ui.Util;
