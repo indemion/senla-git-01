@@ -17,7 +17,7 @@ public abstract class AbstractCsvImporter<T> {
             List<T> entities = new ArrayList<>();
             // Пропускаем строку заголовков
             String header = reader.readLine();
-            if (header.split(",", -1).length != getColumnsCount()) {
+            if (header.split(CSV_SEPARATOR, -1).length != getColumnsCount()) {
                 throw new InvalidCsvFileException("Некорректный формат файла для импорта заказов");
             }
             String line;
