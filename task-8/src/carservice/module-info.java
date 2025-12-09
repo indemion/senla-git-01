@@ -1,0 +1,3 @@
+module carservice {
+    requires di;
+}
