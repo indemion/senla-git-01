@@ -4,27 +4,21 @@ import carservice.common.Period;
 import carservice.exceptions.EntityNotFoundException;
 import carservice.models.order.Order;
 import carservice.models.order.OrderService;
+import di.Container;
+import di.Inject;
 
 import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class MasterService {
-    private static MasterService instance;
     private static int lastId = 0;
-    private final MasterRepository masterRepository = MasterRepository.instance();
-    private OrderService orderService;
+    private final MasterRepository masterRepository;
+    private final OrderService orderService;
 
-    private MasterService() {}
-
-    public static MasterService instance() {
-        if (instance == null) {
-            instance = new MasterService();
-        }
-        return instance;
-    }
-
-    public void setOrderService(OrderService orderService) {
+    @Inject
+    public MasterService(MasterRepository masterRepository, OrderService orderService) {
+        this.masterRepository = masterRepository;
         this.orderService = orderService;
     }
 
@@ -105,7 +99,7 @@ public class MasterService {
     }
 
     public void importFromPath(String path) {
-        CsvImporter csvImporter = new CsvImporter();
+        CsvImporter csvImporter = Container.INSTANCE.resolve(CsvImporter.class);
         List<Master> masters = csvImporter.importFromPath(path);
         masterRepository.save(masters);
     }

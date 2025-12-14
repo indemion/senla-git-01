@@ -7,6 +7,8 @@ import carservice.exceptions.OperationProhibitedException;
 import carservice.models.garage.GarageSpot;
 import carservice.models.master.Master;
 import carservice.models.repositories.IRepository;
+import di.Container;
+import di.Inject;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -14,20 +16,12 @@ import java.util.List;
 import java.util.Optional;
 
 public class OrderService {
-    private static OrderService instance;
     private static int lastId = 0;
     private final IRepository<Order> orderRepository;
 
-    private OrderService() {
-        this.orderRepository = OrderRepository.instance();
-    }
-
-    public static OrderService instance() {
-        if (instance == null) {
-            instance = new OrderService();
-        }
-
-        return instance;
+    @Inject
+    public OrderService(OrderRepository orderRepository) {
+        this.orderRepository = orderRepository;
     }
 
     private int getNextId() {
@@ -151,7 +145,7 @@ public class OrderService {
     }
 
     public void importFromPath(String path) {
-        CsvImporter csvImporter = new CsvImporter();
+        CsvImporter csvImporter = Container.INSTANCE.resolve(CsvImporter.class);
         List<Order> orders = csvImporter.importFromPath(path);
         orderRepository.save(orders);
     }

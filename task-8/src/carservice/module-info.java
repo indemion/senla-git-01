@@ -1,3 +1,3 @@
-module carservice {
+open module carservice {
     requires di;
 }

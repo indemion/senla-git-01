@@ -7,13 +7,20 @@ import carservice.models.garage.GarageSpot;
 import carservice.models.garage.GarageSpotService;
 import carservice.models.master.Master;
 import carservice.models.master.MasterService;
+import di.Inject;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 public class CsvImporter extends AbstractCsvImporter<Order> {
-    private final MasterService masterService = MasterService.instance();
-    private final GarageSpotService garageSpotService = GarageSpotService.instance();
+    private final MasterService masterService;
+    private final GarageSpotService garageSpotService;
+
+    @Inject
+    public CsvImporter(MasterService masterService, GarageSpotService garageSpotService) {
+        this.masterService = masterService;
+        this.garageSpotService = garageSpotService;
+    }
 
     @Override
     public Order createFromCsvString(String str) {

@@ -1,55 +1,55 @@
 package carservice;
 
-import carservice.annotations.Configurator;
+import carservice.common.DataInitializer;
 import carservice.common.ExitProcess;
 import carservice.common.SerializationContainer;
 import carservice.common.SerializationManager;
-import carservice.models.garage.GarageSpotService;
-import carservice.models.master.MasterService;
-import carservice.models.order.OrderService;
 import carservice.seeds.MainSeed;
 import carservice.ui.controllers.ConsoleController;
+import di.Inject;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class App {
+    private final AppConfig appConfig;
+    private final SerializationManager serializationManager;
+    private final ConsoleController consoleController;
+    private final DataInitializer dataInitializer;
+    private final ExitProcess exitProcess;
+
+    @Inject
+    public App(AppConfig appConfig, SerializationManager serializationManager, ConsoleController consoleController,
+               DataInitializer dataInitializer, ExitProcess exitProcess) {
+        this.appConfig = appConfig;
+        this.serializationManager = serializationManager;
+        this.consoleController = consoleController;
+        this.dataInitializer = dataInitializer;
+        this.exitProcess = exitProcess;
+    }
+
     public void run() {
-        initConfig();
         registerExitHook();
         boolean savedDataRestored = restoreSavedDataIfExist();
-        initDependencies();
         if (!savedDataRestored) {
             MainSeed.run();
         }
-        ConsoleController.instance().run();
-    }
-
-    private void initConfig() {
-        AppConfig appConfig = AppConfig.instance();
-        Configurator configurator = new Configurator();
-        configurator.configure(appConfig);
+        consoleController.run();
     }
 
     private void registerExitHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread(new ExitProcess()));
-    }
-
-    private void initDependencies() {
-        MasterService.instance().setOrderService(OrderService.instance());
-        GarageSpotService.instance().setMasterService(MasterService.instance());
+        Runtime.getRuntime().addShutdownHook(exitProcess);
     }
 
     private boolean restoreSavedDataIfExist() {
-        Path filePath = Paths.get(AppConfig.instance().getSaveFile());
+        Path filePath = Paths.get(appConfig.getSaveFile());
         if (Files.isDirectory(filePath) || !Files.isReadable(filePath)) {
             return false;
         }
-        SerializationManager serializationManager = new SerializationManager();
-        SerializationContainer serializationContainer = (SerializationContainer) serializationManager
-                .deserialize(filePath.toString());
-        serializationContainer.restoreReferences();
+        SerializationContainer serializationContainer = serializationManager.load();
+        dataInitializer.init(serializationContainer);
+
         return true;
     }
 }

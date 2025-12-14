@@ -6,13 +6,19 @@ import carservice.models.master.*;
 import carservice.ui.ScannerDecorator;
 import carservice.ui.Util;
 import carservice.ui.views.MasterView;
+import di.Inject;
 
 import java.util.List;
 
 public class MasterController {
-    MasterService masterService = MasterService.instance();
+    MasterService masterService;
     MasterView masterView = new MasterView();
     ScannerDecorator scanner = ScannerDecorator.instance();
+
+    @Inject
+    public MasterController(MasterService masterService) {
+        this.masterService = masterService;
+    }
 
     public void index() {
         masterView.index(masterService.getMasters());

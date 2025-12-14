@@ -8,6 +8,7 @@ import carservice.models.master.MasterService;
 import carservice.models.order.Order;
 import carservice.models.order.OrderService;
 import carservice.models.order.OrderStatus;
+import di.Container;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,9 +17,9 @@ import java.util.Random;
 
 public class MainSeed {
     private static final Random random = new Random();
-    private static final MasterService masterService = MasterService.instance();
-    private static final OrderService orderService = OrderService.instance();
-    private static final GarageSpotService garageSpotService = GarageSpotService.instance();
+    private static final MasterService masterService = Container.INSTANCE.resolve(MasterService.class);
+    private static final OrderService orderService = Container.INSTANCE.resolve(OrderService.class);
+    private static final GarageSpotService garageSpotService = Container.INSTANCE.resolve(GarageSpotService.class);
 
     public static void run() {
         initMasters();

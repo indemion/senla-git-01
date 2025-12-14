@@ -9,15 +9,21 @@ import carservice.models.garage.GarageSpotStatus;
 import carservice.ui.ScannerDecorator;
 import carservice.ui.Util;
 import carservice.ui.views.GarageSpotView;
+import di.Inject;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class GarageSpotController {
-    private final GarageSpotService garageSpotService = GarageSpotService.instance();
+    private final GarageSpotService garageSpotService;
     private final GarageSpotView garageSpotView = new GarageSpotView();
     private final ScannerDecorator scanner = ScannerDecorator.instance();
+
+    @Inject
+    public GarageSpotController(GarageSpotService garageSpotService) {
+        this.garageSpotService = garageSpotService;
+    }
 
     public void index() {
         garageSpotView.index(garageSpotService.getGarageSpots());

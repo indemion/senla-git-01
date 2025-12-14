@@ -7,7 +7,12 @@ import carservice.models.order.OrderService;
 import java.util.Optional;
 
 public class CsvImporter extends AbstractCsvImporter<Master> {
-    private final OrderService orderService = OrderService.instance();
+    private final OrderService orderService;
+
+    public CsvImporter(OrderService orderService) {
+        this.orderService = orderService;
+    }
+
     @Override
     protected int getColumnsCount() {
         return 5;

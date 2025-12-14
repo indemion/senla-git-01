@@ -3,11 +3,17 @@ package carservice.models.garage;
 import carservice.common.AbstractCsvImporter;
 import carservice.models.order.Order;
 import carservice.models.order.OrderService;
+import di.Inject;
 
 import java.util.Optional;
 
 public class CsvImporter extends AbstractCsvImporter<GarageSpot> {
-    private final OrderService orderService = OrderService.instance();
+    private final OrderService orderService;
+
+    @Inject
+    public CsvImporter(OrderService orderService) {
+        this.orderService = orderService;
+    }
 
     @Override
     protected int getColumnsCount() {

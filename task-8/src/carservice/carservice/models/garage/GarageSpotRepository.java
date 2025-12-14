@@ -6,7 +6,7 @@ import carservice.models.repositories.InMemoryRepository;
 public class GarageSpotRepository extends InMemoryRepository<GarageSpot> {
     private static GarageSpotRepository instance;
 
-    private GarageSpotRepository() {
+    public GarageSpotRepository() {
     }
 
     public static GarageSpotRepository instance() {

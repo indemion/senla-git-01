@@ -1,6 +1,7 @@
 package carservice.models.repositories;
 
 import carservice.models.IHasId;
+import carservice.models.order.Order;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -37,5 +38,10 @@ public abstract class InMemoryRepository<T extends IHasId> implements IRepositor
     @Override
     public List<T> findAll() {
         return new ArrayList<>(inMemoryDB.values());
+    }
+
+    public void setAll(List<T> entities) {
+        inMemoryDB.clear();
+        save(entities);
     }
 }

@@ -7,7 +7,7 @@ import carservice.models.repositories.InMemoryRepository;
 public class OrderRepository extends InMemoryRepository<Order> {
     private static OrderRepository instance;
 
-    private OrderRepository() {
+    public OrderRepository() {
     }
 
     public static OrderRepository instance() {

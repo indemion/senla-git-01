@@ -4,14 +4,23 @@ import carservice.ui.controllers.ExitAction;
 import carservice.ui.controllers.GarageSpotController;
 import carservice.ui.controllers.MasterController;
 import carservice.ui.controllers.OrderController;
+import di.Inject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MenuBuilder {
-    MasterController masterController = new MasterController();
-    GarageSpotController garageSpotController = new GarageSpotController();
-    OrderController orderController = new OrderController();
+    private final MasterController masterController;
+    private final GarageSpotController garageSpotController;
+    private final OrderController orderController;
+
+    @Inject
+    public MenuBuilder(OrderController orderController, MasterController masterController,
+                       GarageSpotController garageSpotController) {
+        this.orderController = orderController;
+        this.masterController = masterController;
+        this.garageSpotController = garageSpotController;
+    }
 
     public Menu buildRootMenu() {
         Menu menu = new Menu("Главное меню");

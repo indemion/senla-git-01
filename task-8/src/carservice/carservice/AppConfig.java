@@ -17,7 +17,7 @@ public class AppConfig {
     @ConfigProperty(propertyName = "AppConfig.order.removable")
     private boolean orderRemovable;
 
-    private AppConfig() {}
+    public AppConfig() {}
 
     public static AppConfig instance() {
         if (instance == null) {

@@ -7,6 +7,8 @@ import carservice.exceptions.OperationProhibitedException;
 import carservice.models.master.MasterService;
 import carservice.models.order.Order;
 import carservice.models.order.OrderService;
+import di.Container;
+import di.Inject;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -16,23 +18,16 @@ import java.util.Optional;
 import java.util.Set;
 
 public class GarageSpotService {
-    private static GarageSpotService instance;
     private static int lastId = 0;
-    private final GarageSpotRepository garageSpotRepository = GarageSpotRepository.instance();
-    private final OrderService orderService = OrderService.instance();
-    private MasterService masterService;
+    private final GarageSpotRepository garageSpotRepository;
+    private final OrderService orderService;
+    private final MasterService masterService;
 
-    private GarageSpotService() {}
-
-    public static GarageSpotService instance() {
-        if (instance == null) {
-            instance = new GarageSpotService();
-        }
-
-        return instance;
-    }
-
-    public void setMasterService(MasterService masterService) {
+    @Inject
+    public GarageSpotService(GarageSpotRepository garageSpotRepository, OrderService orderService,
+                             MasterService masterService) {
+        this.garageSpotRepository = garageSpotRepository;
+        this.orderService = orderService;
         this.masterService = masterService;
     }
 
@@ -116,7 +111,7 @@ public class GarageSpotService {
     }
 
     public void importFromPath(String path) {
-        CsvImporter csvImporter = new CsvImporter();
+        CsvImporter csvImporter = Container.INSTANCE.resolve(CsvImporter.class);
         List<GarageSpot> garageSpots = csvImporter.importFromPath(path);
         garageSpotRepository.save(garageSpots);
     }

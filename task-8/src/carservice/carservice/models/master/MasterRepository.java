@@ -6,7 +6,7 @@ import carservice.models.repositories.InMemoryRepository;
 public class MasterRepository extends InMemoryRepository<Master> {
     private static MasterRepository instance;
 
-    private MasterRepository() {
+    public MasterRepository() {
     }
 
     public static MasterRepository instance() {

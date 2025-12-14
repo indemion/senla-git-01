@@ -15,6 +15,7 @@ import carservice.ui.Util;
 import carservice.ui.views.GarageSpotView;
 import carservice.ui.views.MasterView;
 import carservice.ui.views.OrderView;
+import di.Inject;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -23,13 +24,20 @@ import java.util.List;
 import java.util.Optional;
 
 public class OrderController {
-    private final OrderService orderService = OrderService.instance();
-    private final MasterService masterService = MasterService.instance();
-    private final GarageSpotService garageSpotService = GarageSpotService.instance();
+    private final OrderService orderService;
+    private final MasterService masterService;
+    private final GarageSpotService garageSpotService;
     private final OrderView orderView = new OrderView();
     private final MasterView masterView = new MasterView();
     private final GarageSpotView garageSpotView = new GarageSpotView();
     private final ScannerDecorator scanner = ScannerDecorator.instance();
+
+    @Inject
+    public OrderController(OrderService orderService, MasterService masterService, GarageSpotService garageSpotService) {
+        this.orderService = orderService;
+        this.masterService = masterService;
+        this.garageSpotService = garageSpotService;
+    }
 
     public void index() {
         orderView.index(orderService.getOrders());

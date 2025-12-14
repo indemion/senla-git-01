@@ -1,19 +1,12 @@
 package carservice.common;
 
-import carservice.models.garage.GarageSpotRepository;
-import carservice.models.master.MasterRepository;
-import carservice.models.order.OrderRepository;
+import carservice.models.garage.GarageSpot;
+import carservice.models.master.Master;
+import carservice.models.order.Order;
 
 import java.io.Serializable;
+import java.util.List;
 
-public record SerializationContainer(OrderRepository orderRepository, MasterRepository masterRepository,
-                                     GarageSpotRepository garageSpotRepository) implements Serializable {
-    public void restoreReferences() {
-        OrderRepository.setInstance(orderRepository);
-        MasterRepository.setInstance(masterRepository);
-        GarageSpotRepository.setInstance(garageSpotRepository);
-        orderRepository.restoreReferences(masterRepository, garageSpotRepository);
-        masterRepository.restoreReferences(orderRepository);
-        garageSpotRepository.restoreReferences(orderRepository);
-    }
+public record SerializationContainer(List<Order> orders, List<Master> masters,
+                                     List<GarageSpot> garageSpots) implements Serializable {
 }
