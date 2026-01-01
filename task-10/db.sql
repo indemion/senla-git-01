@@ -91,7 +91,7 @@ SELECT model, speed, hd FROM pc WHERE price < 500::money;
 SELECT maker FROM product WHERE type = 'Printer';
 
 -- Найти номер модели, объем памяти и размеры экранов ноутбуков, цена которых превышает 1000 долларов.
-SELECT model, ram, screen FROM laptop WHERE price <= 1000::money;
+SELECT model, ram, screen FROM laptop WHERE price > 1000::money;
 
 -- Найти все записи таблицы Printer для цветных принтеров.
 SELECT * FROM printer WHERE color = 'y';
@@ -109,10 +109,10 @@ WHERE hd >= 100;
 SELECT p.model, price
 FROM product
 JOIN (
-    SELECT model, price FROM pc 
-    UNION 
-    SELECT model, price FROM laptop 
-    UNION 
+    SELECT model, price FROM pc
+    UNION
+    SELECT model, price FROM laptop
+    UNION
     SELECT model, price FROM printer
 ) AS p ON p.model = product.model
 WHERE maker = 'B';
@@ -120,7 +120,7 @@ WHERE maker = 'B';
 -- Найти производителя, выпускающего ПК, но не ноутбуки.
 SELECT DISTINCT maker
 FROM product p1
-WHERE type = 'PC' AND NOT EXISTS(SELECT 1 FROM product WHERE model = p1.model AND type = 'Laptop');
+WHERE type = 'PC' AND NOT EXISTS(SELECT 1 FROM product WHERE maker = p1.maker AND type = 'Laptop');
 
 -- Найти производителей ПК с процессором не менее 450 Мгц. Вывести поля: maker.
 SELECt DISTINCT maker
@@ -129,7 +129,9 @@ JOIN pc ON pc.model = product.model
 WHERE speed >= 450;
 
 -- Найти принтеры, имеющие самую высокую цену. Вывести поля: model, price.
-SELECT model, price FROM printer ORDER BY price DESC LIMIT 1;
+SELECT model, price 
+FROM printer 
+WHERE price = (SELECT MAX(price) FROM printer);
 
 -- Найти среднюю скорость ПК.
 SELECT ROUND(AVG(speed)) AS avg_speed FROM pc;
@@ -141,8 +143,7 @@ SELECT ROUND(AVG(speed)) AS avg_speed FROM laptop WHERE price > 1000::money;
 SELECT ROUND(AVG(speed)) AS avg_speed
 FROM pc
 JOIN product ON product.model = pc.model
-WHERE product.maker = 'A'
-GROUP BY speed;
+WHERE product.maker = 'A';
 
 -- Для каждого значения скорости процессора найти среднюю стоимость ПК с такой же скоростью. Вывести поля: скорость, средняя цена.
 SELECT speed, AVG(price::numeric)::money AS avg_price FROM pc GROUP BY speed;
@@ -165,7 +166,7 @@ WHERE p1.model <> p2.model AND p1.model > p2.model;
 SELECT type, l.model, l.speed
 FROM laptop l
 JOIN product p ON p.model = l.model
-WHERE speed < (SELECT max(speed) FROM pc);
+WHERE speed < (SELECT MIN(speed) FROM pc);
 
 -- Найти производителей самых дешевых цветных принтеров. Вывести поля: maker, price.
 SELECT DISTINCT maker, price
