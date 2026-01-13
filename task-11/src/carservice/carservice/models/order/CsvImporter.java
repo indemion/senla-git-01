@@ -27,13 +27,15 @@ public class CsvImporter extends AbstractCsvImporter<Order> {
         String[] fields = str.split(CSV_SEPARATOR, -1);
         int id = Integer.parseInt(fields[0]);
         int price = Integer.parseInt(fields[1]);
-        OrderStatus status = OrderStatus.valueOf(fields[2]);
-        Optional<Master> optionalMaster = masterService.findById(Integer.parseInt(fields[3]));
+        OrderStatus status = OrderStatus.parse(fields[2]);
+        int masterId = Integer.parseInt(fields[3]);
+        Optional<Master> optionalMaster = masterService.findById(masterId);
         if (optionalMaster.isEmpty()) {
             throw new CsvImportException("Невозможно добавить заказ с id: " + id + " так как в системе нет мастера с " +
                     "указанным в заказе id");
         }
-        Optional<GarageSpot> optionalGarageSpot = garageSpotService.findById(Integer.parseInt(fields[4]));
+        int garageSpotId = Integer.parseInt(fields[4]);
+        Optional<GarageSpot> optionalGarageSpot = garageSpotService.findById(garageSpotId);
         if (optionalGarageSpot.isEmpty()) {
             throw new CsvImportException("Невозможно добавить заказ с id: " + id + " так как в системе нет гаражного " +
                     "места с указанным id");
@@ -49,8 +51,8 @@ public class CsvImporter extends AbstractCsvImporter<Order> {
         LocalDateTime canceledAt = parseLocalDateTime(fields[11]);
         LocalDateTime deletedAt = parseLocalDateTime(fields[12]);
 
-        return new Order(id, price, status, optionalMaster.get(), optionalGarageSpot.get(), estimatedWorkPeriod,
-                actualWorkPeriod, createdAt, closedAt, canceledAt, deletedAt);
+        return new Order(id, price, status, masterId, garageSpotId, estimatedWorkPeriod, actualWorkPeriod, createdAt,
+                closedAt, canceledAt, deletedAt);
     }
 
     @Override

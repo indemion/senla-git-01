@@ -6,6 +6,7 @@ import carservice.exceptions.OperationProhibitedException;
 import carservice.models.garage.CsvExporter;
 import carservice.models.garage.GarageSpotService;
 import carservice.models.garage.GarageSpotStatus;
+import carservice.models.services.AvailabilityService;
 import carservice.ui.ScannerDecorator;
 import carservice.ui.Util;
 import carservice.ui.views.GarageSpotView;
@@ -17,12 +18,17 @@ import java.util.List;
 
 public class GarageSpotController {
     private final GarageSpotService garageSpotService;
+    private final AvailabilityService availabilityService;
+    private final AppConfig appConfig;
     private final GarageSpotView garageSpotView = new GarageSpotView();
     private final ScannerDecorator scanner = ScannerDecorator.instance();
 
     @Inject
-    public GarageSpotController(GarageSpotService garageSpotService) {
+    public GarageSpotController(GarageSpotService garageSpotService, AvailabilityService availabilityService,
+                                AppConfig appConfig) {
         this.garageSpotService = garageSpotService;
+        this.availabilityService = availabilityService;
+        this.appConfig = appConfig;
     }
 
     public void index() {
@@ -39,7 +45,7 @@ public class GarageSpotController {
         System.out.print("Введите дату в формате (11.11.2011): ");
         LocalDate localDate = LocalDate.parse(scanner.nextLine(), DateTimeFormatter.ofPattern("d.M.yyyy"));
         System.out.printf("На дату %s, будет свободно мест %d\n", localDate,
-                garageSpotService.getFreeGarageSpotsCountAtDate(localDate));
+                availabilityService.countAvailableSlotsAtDate(localDate));
     }
 
     public void create() {
@@ -49,7 +55,7 @@ public class GarageSpotController {
     }
 
     public void delete() {
-        if (!AppConfig.instance().isOrderRemovable()) {
+        if (!appConfig.isOrderRemovable()) {
             throw new OperationProhibitedException(OperationProhibitedMessages.GARAGE_SPOT_REMOVING);
         }
         System.out.print("Введите номер гаражного места: ");

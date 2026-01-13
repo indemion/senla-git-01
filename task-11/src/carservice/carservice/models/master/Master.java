@@ -1,17 +1,18 @@
 package carservice.models.master;
 
-import carservice.models.Entity;
+import carservice.dao.MasterDTO;
+import carservice.models.Model;
 import carservice.models.order.Order;
 
-public class Master extends Entity {
+public class Master extends Model {
     private final String firstname;
     private final String lastname;
     private MasterStatus status;
     private Integer orderAtWorkId;
     private transient Order orderAtWork;
 
-    public Master(int id, String firstname, String lastname) {
-        super(id);
+    public Master(String firstname, String lastname) {
+        super(0);
         this.firstname = firstname;
         this.lastname = lastname;
         this.status = MasterStatus.FREE;
@@ -24,6 +25,14 @@ public class Master extends Entity {
         this.status = status;
         this.orderAtWorkId = orderAtWork.getId();
         this.orderAtWork = orderAtWork;
+    }
+
+    public Master(int id, String firstname, String lastname, MasterStatus status, Integer orderAtWorkId) {
+        super(id);
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.status = status;
+        this.orderAtWorkId = orderAtWorkId;
     }
 
     public String getFirstname() {
@@ -70,4 +79,7 @@ public class Master extends Entity {
                  - status: %s""", id, firstname, lastname, status);
     }
 
+    public MasterDTO toEntity() {
+        return new MasterDTO(id, firstname, lastname, status.toString(), orderAtWorkId);
+    }
 }

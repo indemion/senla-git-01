@@ -5,8 +5,10 @@ import carservice.common.OperationProhibitedMessages;
 import carservice.common.Period;
 import carservice.exceptions.OperationProhibitedException;
 import carservice.models.garage.GarageSpot;
+import carservice.models.garage.GarageSpotService;
 import carservice.models.master.Master;
-import carservice.models.repositories.IRepository;
+import carservice.models.master.MasterService;
+import carservice.models.repositories.OrderRepository;
 import di.Container;
 import di.Inject;
 
@@ -16,39 +18,46 @@ import java.util.List;
 import java.util.Optional;
 
 public class OrderService {
-    private static int lastId = 0;
-    private final IRepository<Order> orderRepository;
+    private final OrderRepository orderRepository;
+    private final MasterService masterService;
+    private final GarageSpotService garageSpotService;
+    private final AppConfig appConfig;
 
     @Inject
-    public OrderService(OrderRepository orderRepository) {
+    public OrderService(OrderRepository orderRepository, MasterService masterService,
+                        GarageSpotService garageSpotService, AppConfig appConfig) {
         this.orderRepository = orderRepository;
-    }
-
-    private int getNextId() {
-        return ++lastId;
+        this.masterService = masterService;
+        this.garageSpotService = garageSpotService;
+        this.appConfig = appConfig;
     }
 
     public Order create(int price, Master master, GarageSpot garageSpot, LocalDateTime estimatedWorkStartDateTime,
                         LocalDateTime estimatedWorkEndDateTime) {
-        Order order = new Order(getNextId(), price, master, garageSpot,
+        Order order = new Order(price, master, garageSpot,
                 new Period(estimatedWorkStartDateTime, estimatedWorkEndDateTime));
-        orderRepository.save(order);
-
-        return order;
+        return orderRepository.save(order);
     }
 
     public void delete(int id, boolean soft) {
         Optional<Order> optionalOrder = orderRepository.findById(id);
         optionalOrder.ifPresent(order -> {
-            order.delete();
+            if (order.getStatus() == OrderStatus.DELETED) return;
+            order.setStatus(OrderStatus.DELETED);
+            order.setDeletedAt(LocalDateTime.now());
+            masterService.freeMaster(order.getMasterId());
+            garageSpotService.freeGarageSpot(order.getGarageSpotId());
+
             if (!soft) {
-                orderRepository.delete(id);
+                orderRepository.delete(order);
+            } else {
+                orderRepository.save(order);
             }
         });
     }
 
     public void softDelete(int id) {
-        if (!AppConfig.instance().isOrderRemovable()) {
+        if (!appConfig.isOrderRemovable()) {
             throw new OperationProhibitedException(OperationProhibitedMessages.ORDER_REMOVING);
         }
         delete(id, true);
@@ -56,28 +65,65 @@ public class OrderService {
 
     public void startWorking(int id) {
         Optional<Order> optionalOrder = orderRepository.findById(id);
-        optionalOrder.ifPresent(Order::startWorking);
+        optionalOrder.ifPresent(order -> {
+            if (order.getStatus() == OrderStatus.WORK_IN_PROGRESS) return;
+            if (order.getStatus() == OrderStatus.CREATED) {
+                order.getActualWorkPeriod().setStart(LocalDateTime.now());
+            }
+            order.setStatus(OrderStatus.WORK_IN_PROGRESS);
+            orderRepository.save(order);
+            Optional<Master> optionalMaster = masterService.findById(order.getMasterId());
+            optionalMaster.ifPresent(master -> {
+                master.setOrderAtWork(order);
+                masterService.save(master);
+            });
+            Optional<GarageSpot> optionalGarageSpot = garageSpotService.findById(order.getGarageSpotId());
+            optionalGarageSpot.ifPresent(garageSpot -> {
+                garageSpot.setOrderAtWork(order);
+                garageSpotService.save(garageSpot);
+            });
+        });
     }
 
     public void closeOrder(int id) {
         Optional<Order> optionalOrder = orderRepository.findById(id);
-        optionalOrder.ifPresent(Order::close);
+        optionalOrder.ifPresent(order -> {
+            if (order.getStatus() == OrderStatus.CLOSED) return;
+            if (order.getStatus() == OrderStatus.WORK_IN_PROGRESS) {
+                order.getActualWorkPeriod().setEnd(LocalDateTime.now());
+            }
+            order.setStatus(OrderStatus.CLOSED);
+            order.setClosedAt(LocalDateTime.now());
+            orderRepository.save(order);
+            masterService.freeMaster(order.getMasterId());
+            garageSpotService.freeGarageSpot(order.getGarageSpotId());
+        });
     }
 
     public void cancelOrder(int id) {
         Optional<Order> optionalOrder = orderRepository.findById(id);
-        optionalOrder.ifPresent(Order::cancel);
+        optionalOrder.ifPresent(order -> {
+            if (order.getStatus() == OrderStatus.CANCELED) return;
+            if (order.getStatus() == OrderStatus.WORK_IN_PROGRESS) {
+                order.getActualWorkPeriod().setEnd(LocalDateTime.now());
+            }
+            order.setStatus(OrderStatus.CANCELED);
+            order.setCanceledAt(LocalDateTime.now());
+            orderRepository.save(order);
+            masterService.freeMaster(order.getMasterId());
+            garageSpotService.freeGarageSpot(order.getGarageSpotId());
+        });
     }
 
     public void shiftEstimatedWorkPeriodInCreatedOrders(Duration duration) {
-        if (!AppConfig.instance().isOrderShiftableEstimatedWorkPeriod()) {
+        if (!appConfig.isOrderShiftableEstimatedWorkPeriod()) {
             throw new OperationProhibitedException(OperationProhibitedMessages.ORDER_SHIFTING_ESTIMATED_WORK_PERIOD);
         }
-        for (Order order : orderRepository.findAll()) {
-            if (order.getStatus() == OrderStatus.CREATED) {
-                order.shiftEstimatedWorkPeriod(duration);
-            }
+        List<Order> orders = getOrdersFilteredByStatus(OrderStatus.CREATED);
+        for (Order order : orders) {
+            order.shiftEstimatedWorkPeriod(duration);
         }
+        orderRepository.save(orders);
     }
 
     public Optional<Order> findById(int id) {
@@ -85,72 +131,36 @@ public class OrderService {
     }
 
     public List<Order> getOrders() {
-        return query().ignoreDeletedEntities().get();
+        return orderRepository.findAll();
     }
 
-    public List<Order> getOrdersSorted(SortParam sortParam) {
-        return query().orderBy(sortParam).get();
-    }
-
-    public List<Order> getWIPOrders() {
-        return query().filterByStatus(OrderStatus.WORK_IN_PROGRESS).get();
-    }
-
-    public List<Order> getWIPOrdersSorted(SortParam sortParam) {
-        return query().filterByStatus(OrderStatus.WORK_IN_PROGRESS).orderBy(sortParam).get();
+    public List<Order> getOrdersSorted(SortParams sortParams) {
+        return orderRepository.findFilteredAndSorted(null, sortParams);
     }
 
     public List<Order> getOrdersFilteredByStatus(OrderStatus status) {
-        return query().filterByStatus(status).get();
-    }
-
-    public List<Order> getOrdersFilteredByGarageSpotNumber(int number) {
-        return query().filterByGarageSpotNumber(number).get();
-    }
-
-    public Order getWIPOrderByMaster(Master master) {
-        return master.getOrderAtWork();
-    }
-
-    public List<Order> getOrdersByMaster(Master master) {
-        return query().filterByMaster(master).get();
+        return orderRepository.findFilteredAndSorted(FilterParams.builder().statuses(status).build(), null);
     }
 
     public List<Order> getOrdersByMasterCreatedAndWIP(Master master) {
-        return query().filterByMaster(master).filterByStatuses(OrderStatus.CREATED, OrderStatus.WORK_IN_PROGRESS).get();
-    }
-
-    public List<Order> getOrdersByMasterAndEstimatedWorkPeriodOverlapPeriod(Master master, Period period) {
-        return query().filterByMaster(master)
-                .filterByStatuses(OrderStatus.CREATED, OrderStatus.WORK_IN_PROGRESS)
-                .addPredicate(order -> order.getEstimatedWorkPeriod().isOverlap(period)).get();
+        FilterParams filterParams = FilterParams.builder().masterId(master.getId())
+                .statuses(OrderStatus.CREATED, OrderStatus.WORK_IN_PROGRESS).build();
+        return orderRepository.findFilteredAndSorted(filterParams, null);
     }
 
     public List<Order> getOrdersFilteredByStatusInPeriod(OrderStatus status, Period period) {
-        return query().filterByStatus(status).filterByStatusInPeriod(status, period).get();
-    }
-
-    public List<Order> getOrdersFilteredByStatusInPeriodSorted(OrderStatus status, Period period, SortParam sortParam) {
-        return query().filterByStatus(status).filterByStatusInPeriod(status, period).orderBy(sortParam).get();
-    }
-
-    public List<Order> getOrdersFilteredByGarageSpotInPeriod(GarageSpot spot, Period period) {
-        return query().addPredicate(order -> order.getGarageSpot().getNumber() == spot.getNumber() &&
-                order.getEstimatedWorkPeriod().isOverlap(period)).get();
+        FilterParams filterParams = FilterParams.builder().statuses(status).estimatedWorkStartInPeriod(period).build();
+        return orderRepository.findFilteredAndSorted(filterParams, null);
     }
 
     public String exportToPath(String path) {
         CsvExporter csvExporter = new CsvExporter();
-        return csvExporter.exportToPath(path, query().get());
+        return csvExporter.exportToPath(path, orderRepository.findAll());
     }
 
     public void importFromPath(String path) {
         CsvImporter csvImporter = Container.INSTANCE.resolve(CsvImporter.class);
         List<Order> orders = csvImporter.importFromPath(path);
         orderRepository.save(orders);
-    }
-
-    private Query query() {
-        return new Query(orderRepository.findAll());
     }
 }

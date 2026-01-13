@@ -10,6 +10,7 @@ import carservice.models.garage.GarageSpotService;
 import carservice.models.master.Master;
 import carservice.models.master.MasterService;
 import carservice.models.order.*;
+import carservice.models.services.FreePeriodService;
 import carservice.ui.ScannerDecorator;
 import carservice.ui.Util;
 import carservice.ui.views.GarageSpotView;
@@ -27,16 +28,21 @@ public class OrderController {
     private final OrderService orderService;
     private final MasterService masterService;
     private final GarageSpotService garageSpotService;
+    private final FreePeriodService freePeriodService;
+    private final AppConfig appConfig;
     private final OrderView orderView = new OrderView();
     private final MasterView masterView = new MasterView();
     private final GarageSpotView garageSpotView = new GarageSpotView();
     private final ScannerDecorator scanner = ScannerDecorator.instance();
 
     @Inject
-    public OrderController(OrderService orderService, MasterService masterService, GarageSpotService garageSpotService) {
+    public OrderController(OrderService orderService, MasterService masterService, GarageSpotService garageSpotService,
+                           FreePeriodService freePeriodService, AppConfig appConfig) {
         this.orderService = orderService;
         this.masterService = masterService;
         this.garageSpotService = garageSpotService;
+        this.freePeriodService = freePeriodService;
+        this.appConfig = appConfig;
     }
 
     public void index() {
@@ -65,7 +71,7 @@ public class OrderController {
     }
 
     public void sortedIndex() {
-        orderView.index(orderService.getOrdersSorted(new SortParam(
+        orderView.index(orderService.getOrdersSorted(new SortParams(
                 Util.chooseVariant("Выберите критерий сортировки: ", List.of(SortCriteria.values())),
                 Util.chooseVariant("Выберите направление сортировки: ", List.of(SortDirection.values())))));
     }
@@ -73,7 +79,7 @@ public class OrderController {
     public void create() {
         System.out.print("Введите предполагаемую длительность выполнения заказа в часах: ");
         int durationInHours = scanner.nextInt();
-        Period closestFreePeriod = masterService.getClosestFreePeriodWithDuration(Duration.ofHours(durationInHours));
+        Period closestFreePeriod = freePeriodService.getClosestFreePeriodWithDuration(Duration.ofHours(durationInHours));
         System.out.println("Предполагаемый период выполнения заказа: " + closestFreePeriod);
         System.out.println("Список мастеров доступных на этот период: ");
         List<Master> freeMasters = masterService.getMastersFreeInPeriod(closestFreePeriod);
@@ -111,7 +117,7 @@ public class OrderController {
     }
 
     public void delete() {
-        if (!AppConfig.instance().isOrderRemovable()) {
+        if (!appConfig.isOrderRemovable()) {
             throw new OperationProhibitedException(OperationProhibitedMessages.ORDER_REMOVING);
         }
         System.out.print("Введите id заказа, который хотитет удалить: ");
@@ -142,7 +148,7 @@ public class OrderController {
     }
 
     public void shiftOrdersEstimatedWorkPeriod() {
-        if (!AppConfig.instance().isOrderShiftableEstimatedWorkPeriod()) {
+        if (!appConfig.isOrderShiftableEstimatedWorkPeriod()) {
             throw new OperationProhibitedException(OperationProhibitedMessages.ORDER_SHIFTING_ESTIMATED_WORK_PERIOD);
         }
         System.out.print("Введите кол-во часов на которое необходимо сместить все заказы: ");

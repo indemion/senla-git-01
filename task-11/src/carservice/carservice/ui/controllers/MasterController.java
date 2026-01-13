@@ -1,7 +1,6 @@
 package carservice.ui.controllers;
 
 import carservice.common.SortDirection;
-import carservice.exceptions.EntityNotFoundException;
 import carservice.models.master.*;
 import carservice.ui.ScannerDecorator;
 import carservice.ui.Util;
@@ -9,6 +8,7 @@ import carservice.ui.views.MasterView;
 import di.Inject;
 
 import java.util.List;
+import java.util.Optional;
 
 public class MasterController {
     MasterService masterService;
@@ -27,15 +27,16 @@ public class MasterController {
     public void filteredIndex() {
         System.out.print("Введите id заказа, для которого хотите найти назначенного мастера: ");
         int id = scanner.nextInt();
-        try {
-            masterView.show(masterService.getMasterByOrderId(id));
-        } catch (EntityNotFoundException e) {
-            System.out.println(e.getMessage());
+        Optional<Master> optionalMaster = masterService.getMasterByOrderId(id);
+        if (optionalMaster.isEmpty()) {
+            System.out.println("Мастер с id заказа = " + id + ", не найден.");
+            return;
         }
+        masterView.show(optionalMaster.get());
     }
 
     public void sortedIndex() {
-        masterView.index(masterService.getMastersSorted(new SortParam(
+        masterView.index(masterService.getMastersSorted(new SortParams(
                 Util.chooseVariant("Выберите критерий сортировки: ", List.of(SortCriteria.values())),
                 Util.chooseVariant("Выберите порядок сортировки: ", List.of(SortDirection.values())))));
     }

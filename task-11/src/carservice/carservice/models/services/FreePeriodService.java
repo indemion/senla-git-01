@@ -1,15 +1,46 @@
-package carservice.models.master;
+package carservice.models.services;
 
 import carservice.common.Period;
+import carservice.models.master.Master;
+import carservice.models.master.MasterService;
+import carservice.models.order.Order;
+import carservice.models.order.OrderService;
+import di.Inject;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
-public class FreePeriodFinder {
-    public static Period findClosestFreePeriod(List<Period> occupiedPeriods, Duration requiredDuration) {
+public class FreePeriodService {
+    private final OrderService orderService;
+    private final MasterService masterService;
+
+    @Inject
+    public FreePeriodService(OrderService orderService, MasterService masterService) {
+        this.orderService = orderService;
+        this.masterService = masterService;
+    }
+
+    public Period getClosestFreePeriodWithDuration(Duration requiredDuration) {
+        List<List<Period>> occupiedPeriodsGroupedByMaster = new ArrayList<>();
+        masterService.getMasters().forEach(master -> {
+            List<Order> orders = orderService.getOrdersByMasterCreatedAndWIP(master);
+            occupiedPeriodsGroupedByMaster.add(orders.stream().map(Order::getEstimatedWorkPeriod)
+                    .collect(Collectors.toList()));
+        });
+        occupiedPeriodsGroupedByMaster.forEach(periods -> periods.sort(Comparator.comparing(Period::getStart)));
+
+        List<Period> freePeriods = new ArrayList<>();
+        for (List<Period> occupiedPeriods : occupiedPeriodsGroupedByMaster) {
+            freePeriods.add(findClosestFreePeriod(occupiedPeriods, requiredDuration));
+        }
+        freePeriods.sort(Comparator.comparing(Period::getStart));
+
+        return freePeriods.stream().findFirst().get();
+    }
+
+    private Period findClosestFreePeriod(List<Period> occupiedPeriods, Duration requiredDuration) {
         List<Period> periods = new ArrayList<>(occupiedPeriods);
         periods.sort(Comparator.comparing(Period::getStart));
         LocalDateTime currentPointer = LocalDateTime.now();

@@ -1,106 +1,71 @@
 package carservice.models.master;
 
 import carservice.common.Period;
-import carservice.exceptions.EntityNotFoundException;
-import carservice.models.order.Order;
-import carservice.models.order.OrderService;
+import carservice.models.repositories.MasterRepository;
 import di.Container;
 import di.Inject;
 
-import java.time.Duration;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
 
 public class MasterService {
-    private static int lastId = 0;
     private final MasterRepository masterRepository;
-    private final OrderService orderService;
 
     @Inject
-    public MasterService(MasterRepository masterRepository, OrderService orderService) {
+    public MasterService(MasterRepository masterRepository) {
         this.masterRepository = masterRepository;
-        this.orderService = orderService;
-    }
-
-    private static int getNextId() {
-        return ++lastId;
     }
 
     public Master create(String firstname, String lastname) {
-        Master master = new Master(getNextId(), firstname, lastname);
-        masterRepository.save(master);
-
-        return master;
+        Master master = new Master(firstname, lastname);
+        return masterRepository.save(master);
     }
 
     public void delete(int id) {
         Optional<Master> optionalMaster = masterRepository.findById(id);
-        optionalMaster.ifPresent(master -> masterRepository.delete(id));
+        optionalMaster.ifPresent(masterRepository::delete);
     }
 
     public Optional<Master> findById(int id) {
         return masterRepository.findById(id);
     }
 
-    public Master getMasterByOrderId(int id) throws EntityNotFoundException {
-        Optional<Order> optionalOrder = orderService.findById(id);
-        if (optionalOrder.isEmpty()) {
-            throw new EntityNotFoundException("Заказ с id " + id + " не найден.");
-        }
-
-        return optionalOrder.get().getMaster();
+    public Optional<Master> getMasterByOrderId(int id) {
+        return masterRepository.findByOrderId(id);
     }
 
     public List<Master> getMasters() {
-        return query().get();
+        return masterRepository.findAll();
     }
 
-    public List<Master> getMastersSorted(SortParam sortParam) {
-        return query().orderBy(sortParam).get();
-    }
-
-    public List<Master> getMastersFilteredByStatus(MasterStatus status) {
-        return query().filterByStatus(status).get();
-    }
-
-    public List<Master> getMastersWhereIdNotIn(Set<Integer> busyMasterIds) {
-        return query().filterByIdNotIn(busyMasterIds).get();
+    public List<Master> getMastersSorted(SortParams sortParams) {
+        return masterRepository.findSorted(sortParams);
     }
 
     public List<Master> getMastersFreeInPeriod(Period period) {
-        return query().addPredicate(master ->
-                orderService.getOrdersByMasterAndEstimatedWorkPeriodOverlapPeriod(master, period).isEmpty()).get();
-    }
-
-    public Period getClosestFreePeriodWithDuration(Duration requiredDuration) {
-        List<List<Period>> periodsList = new ArrayList<>();
-        query().get().forEach(master -> {
-            List<Order> orders = orderService.getOrdersByMasterCreatedAndWIP(master);
-            periodsList.add(orders.stream().map(Order::getEstimatedWorkPeriod).collect(Collectors.toList()));
-        });
-        periodsList.forEach(periods -> periods.sort(Comparator.comparing(Period::getStart)));
-
-        List<Period> freePeriods = new ArrayList<>();
-        for (List<Period> periods : periodsList) {
-            freePeriods.add(FreePeriodFinder.findClosestFreePeriod(periods, requiredDuration));
-        }
-        freePeriods.sort(Comparator.comparing(Period::getStart));
-
-        return freePeriods.stream().findFirst().get();
-    }
-
-    public Query query() {
-        return new Query(masterRepository.findAll());
+        return masterRepository.findMastersFreeInPeriod(period);
     }
 
     public String exportToPath(String path) {
         CsvExporter csvExporter = new CsvExporter();
-        return csvExporter.exportToPath(path, query().get());
+        return csvExporter.exportToPath(path, getMasters());
     }
 
     public void importFromPath(String path) {
         CsvImporter csvImporter = Container.INSTANCE.resolve(CsvImporter.class);
         List<Master> masters = csvImporter.importFromPath(path);
         masterRepository.save(masters);
+    }
+
+    public void freeMaster(int masterId) {
+        Optional<Master> optionalMaster = masterRepository.findById(masterId);
+        optionalMaster.ifPresent(master -> {
+            master.setOrderAtWork(null);
+            masterRepository.save(master);
+        });
+    }
+
+    public void save(Master master) {
+        masterRepository.save(master);
     }
 }

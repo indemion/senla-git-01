@@ -1,26 +1,26 @@
-package carservice.models.order;
+package carservice.models.master;
 
 import carservice.common.SortDirection;
 
-public class SortParam {
+public class SortParams {
     private final SortCriteria sortCriteria;
     private final SortDirection sortDirection;
 
-    public SortParam(SortCriteria field) {
-        this.sortCriteria = field;
+    public SortParams(SortCriteria sortCriteria) {
+        this.sortCriteria = sortCriteria;
         this.sortDirection = SortDirection.ASC;
     }
 
-    public SortParam(SortCriteria sortCriteria, SortDirection sortDirection) {
+    public SortParams(SortCriteria sortCriteria, SortDirection sortDirection) {
         this.sortCriteria = sortCriteria;
         this.sortDirection = sortDirection;
     }
 
-    public SortDirection getSortDirection() {
-        return sortDirection;
-    }
-
     public SortCriteria getSortCriteria() {
         return sortCriteria;
+    }
+
+    public SortDirection getSortDirection() {
+        return sortDirection;
     }
 }

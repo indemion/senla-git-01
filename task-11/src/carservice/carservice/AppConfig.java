@@ -17,15 +17,16 @@ public class AppConfig {
     @ConfigProperty(propertyName = "AppConfig.order.removable")
     private boolean orderRemovable;
 
+    @ConfigProperty(propertyName = "AppConfig.db.url")
+    private String dbUrl;
+
+    @ConfigProperty(propertyName = "AppConfig.db.user")
+    private String dbUser;
+
+    @ConfigProperty(propertyName = "AppConfig.db.password")
+    private String dbPassword;
+
     public AppConfig() {}
-
-    public static AppConfig instance() {
-        if (instance == null) {
-            instance = new AppConfig();
-        }
-
-        return instance;
-    }
 
     public String getSaveFile() {
         return saveFile;
@@ -41,5 +42,17 @@ public class AppConfig {
 
     public boolean isOrderRemovable() {
         return orderRemovable;
+    }
+
+    public String getDbUrl() {
+        return dbUrl;
+    }
+
+    public String getDbUser() {
+        return dbUser;
+    }
+
+    public String getDbPassword() {
+        return dbPassword;
     }
 }

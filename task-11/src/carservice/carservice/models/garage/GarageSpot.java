@@ -1,16 +1,17 @@
 package carservice.models.garage;
 
-import carservice.models.Entity;
+import carservice.dao.GarageSpotDTO;
+import carservice.models.Model;
 import carservice.models.order.Order;
 
-public class GarageSpot extends Entity {
+public class GarageSpot extends Model {
     private final int number;
     private GarageSpotStatus status;
     private Integer orderAtWorkId;
     private transient Order orderAtWork;
 
-    GarageSpot(int id, int number) {
-        super(id);
+    GarageSpot(int number) {
+        super(0);
         this.number = number;
         this.status = GarageSpotStatus.FREE;
     }
@@ -21,6 +22,13 @@ public class GarageSpot extends Entity {
         this.status = status;
         this.orderAtWorkId = orderAtWork.getId();
         this.orderAtWork = orderAtWork;
+    }
+
+    public GarageSpot(int id, int number, GarageSpotStatus status, Integer orderAtWorkId) {
+        super(id);
+        this.number = number;
+        this.status = status;
+        this.orderAtWorkId = orderAtWorkId;
     }
 
     public int getNumber() {

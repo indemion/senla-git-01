@@ -15,6 +15,10 @@ public enum Container {
         registry.put(clazz, clazz);
     }
 
+    public void register(Class<?> clazz, Class<?> clazzImpl) {
+        registry.put(clazz, clazzImpl);
+    }
+
     public void registerInstance(Class<?> clazz, Object instance) {
         instances.put(clazz, instance);
     }

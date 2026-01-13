@@ -20,8 +20,8 @@ public class CsvExporter extends AbstractCsvExporter<Order> {
         line.append(escapeCsvField(order.getId())).append(CSV_SEPARATOR);
         line.append(escapeCsvField(order.getPrice())).append(CSV_SEPARATOR);
         line.append(escapeCsvField(order.getStatus())).append(CSV_SEPARATOR);
-        line.append(escapeCsvField(order.getMaster().getId())).append(CSV_SEPARATOR);
-        line.append(escapeCsvField(order.getGarageSpot().getId())).append(CSV_SEPARATOR);
+        line.append(escapeCsvField(order.getMasterId())).append(CSV_SEPARATOR);
+        line.append(escapeCsvField(order.getGarageSpotId())).append(CSV_SEPARATOR);
         line.append(escapeCsvField(order.getEstimatedWorkPeriod().getStart())).append(CSV_SEPARATOR);
         line.append(escapeCsvField(order.getEstimatedWorkPeriod().getEnd())).append(CSV_SEPARATOR);
         line.append(escapeCsvField(order.getActualWorkPeriod().getStart())).append(CSV_SEPARATOR);

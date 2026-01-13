@@ -48,11 +48,6 @@ public class Period implements Serializable {
         end = end.plus(duration);
     }
 
-    public boolean isOverlap(Period period) {
-        return !(end.isBefore(period.getStart()) || end.isEqual(period.getStart()) || start.isAfter(period.getEnd())
-                || start.isEqual(period.getEnd()));
-    }
-
     @Override
     public String toString() {
         String startString = start == null ? null : start.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"));
