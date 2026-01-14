@@ -3,7 +3,9 @@ package carservice.models.order;
 import carservice.AppConfig;
 import carservice.common.OperationProhibitedMessages;
 import carservice.common.Period;
+import carservice.exceptions.DataAccessException;
 import carservice.exceptions.OperationProhibitedException;
+import carservice.exceptions.ServiceException;
 import carservice.models.garage.GarageSpot;
 import carservice.models.garage.GarageSpotService;
 import carservice.models.master.Master;
@@ -12,6 +14,8 @@ import carservice.models.repositories.OrderRepository;
 import di.Container;
 import di.Inject;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,15 +26,18 @@ public class OrderService {
     private final MasterService masterService;
     private final GarageSpotService garageSpotService;
     private final AppConfig appConfig;
+    private final Connection connection;
 
     @Inject
     public OrderService(OrderRepository orderRepository, MasterService masterService,
-                        GarageSpotService garageSpotService, AppConfig appConfig) {
+                        GarageSpotService garageSpotService, AppConfig appConfig, Connection connection) {
         this.orderRepository = orderRepository;
         this.masterService = masterService;
         this.garageSpotService = garageSpotService;
         this.appConfig = appConfig;
+        this.connection = connection;
     }
+
 
     public Order create(int price, Master master, GarageSpot garageSpot, LocalDateTime estimatedWorkStartDateTime,
                         LocalDateTime estimatedWorkEndDateTime) {
@@ -45,14 +52,15 @@ public class OrderService {
             if (order.getStatus() == OrderStatus.DELETED) return;
             order.setStatus(OrderStatus.DELETED);
             order.setDeletedAt(LocalDateTime.now());
-            masterService.freeMaster(order.getMasterId());
-            garageSpotService.freeGarageSpot(order.getGarageSpotId());
-
-            if (!soft) {
-                orderRepository.delete(order);
-            } else {
-                orderRepository.save(order);
-            }
+            executeInTransaction(() -> {
+                masterService.freeMaster(order.getMasterId());
+                garageSpotService.freeGarageSpot(order.getGarageSpotId());
+                if (!soft) {
+                    orderRepository.delete(order);
+                } else {
+                    orderRepository.save(order);
+                }
+            });
         });
     }
 
@@ -70,17 +78,19 @@ public class OrderService {
             if (order.getStatus() == OrderStatus.CREATED) {
                 order.getActualWorkPeriod().setStart(LocalDateTime.now());
             }
-            order.setStatus(OrderStatus.WORK_IN_PROGRESS);
-            orderRepository.save(order);
-            Optional<Master> optionalMaster = masterService.findById(order.getMasterId());
-            optionalMaster.ifPresent(master -> {
-                master.setOrderAtWork(order);
-                masterService.save(master);
-            });
-            Optional<GarageSpot> optionalGarageSpot = garageSpotService.findById(order.getGarageSpotId());
-            optionalGarageSpot.ifPresent(garageSpot -> {
-                garageSpot.setOrderAtWork(order);
-                garageSpotService.save(garageSpot);
+            executeInTransaction(() -> {
+                order.setStatus(OrderStatus.WORK_IN_PROGRESS);
+                orderRepository.save(order);
+                Optional<Master> optionalMaster = masterService.findById(order.getMasterId());
+                optionalMaster.ifPresent(master -> {
+                    master.setOrderAtWork(order);
+                    masterService.save(master);
+                });
+                Optional<GarageSpot> optionalGarageSpot = garageSpotService.findById(order.getGarageSpotId());
+                optionalGarageSpot.ifPresent(garageSpot -> {
+                    garageSpot.setOrderAtWork(order);
+                    garageSpotService.save(garageSpot);
+                });
             });
         });
     }
@@ -94,9 +104,11 @@ public class OrderService {
             }
             order.setStatus(OrderStatus.CLOSED);
             order.setClosedAt(LocalDateTime.now());
-            orderRepository.save(order);
-            masterService.freeMaster(order.getMasterId());
-            garageSpotService.freeGarageSpot(order.getGarageSpotId());
+            executeInTransaction(() -> {
+                orderRepository.save(order);
+                masterService.freeMaster(order.getMasterId());
+                garageSpotService.freeGarageSpot(order.getGarageSpotId());
+            });
         });
     }
 
@@ -109,9 +121,11 @@ public class OrderService {
             }
             order.setStatus(OrderStatus.CANCELED);
             order.setCanceledAt(LocalDateTime.now());
-            orderRepository.save(order);
-            masterService.freeMaster(order.getMasterId());
-            garageSpotService.freeGarageSpot(order.getGarageSpotId());
+            executeInTransaction(() -> {
+                orderRepository.save(order);
+                masterService.freeMaster(order.getMasterId());
+                garageSpotService.freeGarageSpot(order.getGarageSpotId());
+            });
         });
     }
 
@@ -123,7 +137,7 @@ public class OrderService {
         for (Order order : orders) {
             order.shiftEstimatedWorkPeriod(duration);
         }
-        orderRepository.save(orders);
+        executeInTransaction(() -> orderRepository.save(orders));
     }
 
     public Optional<Order> findById(int id) {
@@ -162,5 +176,26 @@ public class OrderService {
         CsvImporter csvImporter = Container.INSTANCE.resolve(CsvImporter.class);
         List<Order> orders = csvImporter.importFromPath(path);
         orderRepository.save(orders);
+    }
+
+    private void executeInTransaction(Runnable runnable) {
+        try {
+            connection.setAutoCommit(false);
+            runnable.run();
+            connection.commit();
+        } catch (DataAccessException | SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                throw new ServiceException("Ошибка отката транзакции", ex);
+            }
+            throw new ServiceException("Ошибка транзакции", e);
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException e) {
+                System.out.println("Не удалось установить параметр автокоммита в true.");
+            }
+        }
     }
 }
