@@ -2,7 +2,7 @@ package ru.indemion.carservice.ui.controllers;
 
 import ru.indemion.carservice.ui.MenuBuilder;
 import ru.indemion.carservice.ui.Navigator;
-import ru.indemion.carservice.ui.ScannerDecorator;
+import ru.indemion.carservice.ui.utils.ScannerDecorator;
 import ru.indemion.di.Inject;
 
 import java.util.Scanner;

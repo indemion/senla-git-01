@@ -1,4 +1,4 @@
-package ru.indemion.carservice.ui;
+package ru.indemion.carservice.ui.utils;
 
 import java.util.Scanner;
 

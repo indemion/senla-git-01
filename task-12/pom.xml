@@ -13,6 +13,8 @@
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
     <postgresql.version>42.7.8</postgresql.version>
+    <log4j-core.version>2.24.3</log4j-core.version>
+    <log4j-api.version>2.24.3</log4j-api.version>
   </properties>
 
   <modules>
