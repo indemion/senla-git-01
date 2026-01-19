@@ -1,0 +1,3 @@
+module di {
+    exports di;
+}
