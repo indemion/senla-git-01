@@ -2,28 +2,31 @@ package ru.indemion.carservice.models.master;
 
 import ru.indemion.carservice.common.Period;
 import ru.indemion.carservice.models.repositories.MasterRepository;
+import ru.indemion.carservice.models.services.AbstractTransactionalService;
+import ru.indemion.carservice.util.HibernateUtil;
 import ru.indemion.di.Container;
 import ru.indemion.di.Inject;
 
 import java.util.List;
 import java.util.Optional;
 
-public class MasterService {
+public class MasterService extends AbstractTransactionalService {
     private final MasterRepository masterRepository;
 
     @Inject
     public MasterService(MasterRepository masterRepository) {
+        super(HibernateUtil.getCurrentSession());
         this.masterRepository = masterRepository;
     }
 
     public Master create(String firstname, String lastname) {
         Master master = new Master(firstname, lastname);
-        return masterRepository.save(master);
+        return inTransaction(() -> masterRepository.save(master));
     }
 
     public void delete(int id) {
         Optional<Master> optionalMaster = masterRepository.findById(id);
-        optionalMaster.ifPresent(masterRepository::delete);
+        optionalMaster.ifPresent(master -> inTransaction(() -> masterRepository.delete(master)));
     }
 
     public Optional<Master> findById(int id) {
@@ -54,7 +57,7 @@ public class MasterService {
     public void importFromPath(String path) {
         CsvImporter csvImporter = Container.INSTANCE.resolve(CsvImporter.class);
         List<Master> masters = csvImporter.importFromPath(path);
-        masterRepository.save(masters);
+        inTransaction(() -> masterRepository.save(masters));
     }
 
     public void freeMaster(int masterId) {

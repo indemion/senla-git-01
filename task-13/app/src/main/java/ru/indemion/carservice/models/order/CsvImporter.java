@@ -51,8 +51,8 @@ public class CsvImporter extends AbstractCsvImporter<Order> {
         LocalDateTime canceledAt = parseLocalDateTime(fields[11]);
         LocalDateTime deletedAt = parseLocalDateTime(fields[12]);
 
-        return new Order(id, price, status, masterId, garageSpotId, estimatedWorkPeriod, actualWorkPeriod, createdAt,
-                closedAt, canceledAt, deletedAt);
+        return new Order(id, price, status, optionalMaster.get(), optionalGarageSpot.get(), estimatedWorkPeriod,
+                actualWorkPeriod, createdAt, closedAt, canceledAt, deletedAt);
     }
 
     @Override

@@ -14,15 +14,6 @@ public class AppConfig {
     @ConfigProperty(propertyName = "order.removable")
     private boolean orderRemovable;
 
-    @ConfigProperty(propertyName = "db.url")
-    private String dbUrl;
-
-    @ConfigProperty(propertyName = "db.user")
-    private String dbUser;
-
-    @ConfigProperty(propertyName = "db.password")
-    private String dbPassword;
-
     public AppConfig() {
     }
 
@@ -36,17 +27,5 @@ public class AppConfig {
 
     public boolean isOrderRemovable() {
         return orderRemovable;
-    }
-
-    public String getDbUrl() {
-        return dbUrl;
-    }
-
-    public String getDbUser() {
-        return dbUser;
-    }
-
-    public String getDbPassword() {
-        return dbPassword;
     }
 }

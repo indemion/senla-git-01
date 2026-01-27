@@ -1,6 +1,7 @@
 package ru.indemion.carservice.models.order;
 
 import ru.indemion.carservice.common.AbstractCsvExporter;
+import ru.indemion.carservice.common.Period;
 
 public class CsvExporter extends AbstractCsvExporter<Order> {
     @Override
@@ -16,15 +17,17 @@ public class CsvExporter extends AbstractCsvExporter<Order> {
 
     @Override
     protected String convert(Order order) {
+        Period estimatedWorkPeriod = order.getEstimatedWorkPeriod();
+        Period actualWorkPeriod = order.getActualWorkPeriod();
         String line = escapeCsvField(order.getId()) + CSV_SEPARATOR +
                 escapeCsvField(order.getPrice()) + CSV_SEPARATOR +
                 escapeCsvField(order.getStatus()) + CSV_SEPARATOR +
                 escapeCsvField(order.getMasterId()) + CSV_SEPARATOR +
                 escapeCsvField(order.getGarageSpotId()) + CSV_SEPARATOR +
-                escapeCsvField(order.getEstimatedWorkPeriod().getStart()) + CSV_SEPARATOR +
-                escapeCsvField(order.getEstimatedWorkPeriod().getEnd()) + CSV_SEPARATOR +
-                escapeCsvField(order.getActualWorkPeriod().getStart()) + CSV_SEPARATOR +
-                escapeCsvField(order.getActualWorkPeriod().getEnd()) + CSV_SEPARATOR +
+                escapeCsvField(estimatedWorkPeriod.getStart()) + CSV_SEPARATOR +
+                escapeCsvField(estimatedWorkPeriod.getEnd()) + CSV_SEPARATOR +
+                escapeCsvField(actualWorkPeriod != null ? actualWorkPeriod.getStart() : null) + CSV_SEPARATOR +
+                escapeCsvField(actualWorkPeriod != null ? actualWorkPeriod.getEnd() : null) + CSV_SEPARATOR +
                 escapeCsvField(order.getCreatedAt()) + CSV_SEPARATOR +
                 escapeCsvField(order.getClosedAt()) + CSV_SEPARATOR +
                 escapeCsvField(order.getCanceledAt()) + CSV_SEPARATOR +

@@ -2,3 +2,4 @@
 /app/target/
 /di/target/
 program.jar
+/logs/

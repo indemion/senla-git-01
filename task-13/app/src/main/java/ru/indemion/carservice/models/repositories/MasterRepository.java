@@ -10,10 +10,7 @@ import java.util.Optional;
 
 public interface MasterRepository extends Repository<Master> {
     List<Master> findSorted(SortParams sortParams);
-
     List<Master> findFilteredAndSorted(FilterParams filterParams, SortParams sortParams);
-
     List<Master> findMastersFreeInPeriod(Period period);
-
     Optional<Master> findByOrderId(int id);
 }

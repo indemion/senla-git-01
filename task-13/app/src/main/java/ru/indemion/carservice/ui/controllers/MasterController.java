@@ -6,9 +6,9 @@ import ru.indemion.carservice.models.master.Master;
 import ru.indemion.carservice.models.master.MasterService;
 import ru.indemion.carservice.models.master.SortCriteria;
 import ru.indemion.carservice.models.master.SortParams;
+import ru.indemion.carservice.ui.utils.OperationLogger;
 import ru.indemion.carservice.ui.utils.ScannerDecorator;
 import ru.indemion.carservice.ui.utils.Util;
-import ru.indemion.carservice.ui.utils.OperationLogger;
 import ru.indemion.carservice.ui.views.MasterView;
 import ru.indemion.di.Inject;
 

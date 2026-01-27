@@ -3,39 +3,36 @@ package ru.indemion.carservice.models.order;
 import ru.indemion.carservice.AppConfig;
 import ru.indemion.carservice.common.OperationProhibitedMessages;
 import ru.indemion.carservice.common.Period;
-import ru.indemion.carservice.exceptions.DataAccessException;
 import ru.indemion.carservice.exceptions.OperationProhibitedException;
-import ru.indemion.carservice.exceptions.ServiceException;
 import ru.indemion.carservice.models.garage.GarageSpot;
 import ru.indemion.carservice.models.garage.GarageSpotService;
 import ru.indemion.carservice.models.master.Master;
 import ru.indemion.carservice.models.master.MasterService;
 import ru.indemion.carservice.models.repositories.OrderRepository;
+import ru.indemion.carservice.models.services.AbstractTransactionalService;
+import ru.indemion.carservice.util.HibernateUtil;
 import ru.indemion.di.Container;
 import ru.indemion.di.Inject;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-public class OrderService {
+public class OrderService extends AbstractTransactionalService {
     private final OrderRepository orderRepository;
     private final MasterService masterService;
     private final GarageSpotService garageSpotService;
     private final AppConfig appConfig;
-    private final Connection connection;
 
     @Inject
     public OrderService(OrderRepository orderRepository, MasterService masterService,
-                        GarageSpotService garageSpotService, AppConfig appConfig, Connection connection) {
+                        GarageSpotService garageSpotService, AppConfig appConfig) {
+        super(HibernateUtil.getCurrentSession());
         this.orderRepository = orderRepository;
         this.masterService = masterService;
         this.garageSpotService = garageSpotService;
         this.appConfig = appConfig;
-        this.connection = connection;
     }
 
 
@@ -43,7 +40,7 @@ public class OrderService {
                         LocalDateTime estimatedWorkEndDateTime) {
         Order order = new Order(price, master, garageSpot,
                 new Period(estimatedWorkStartDateTime, estimatedWorkEndDateTime));
-        return orderRepository.save(order);
+        return inTransaction(() -> orderRepository.save(order));
     }
 
     public void delete(int id, boolean soft) {
@@ -52,7 +49,7 @@ public class OrderService {
             if (order.getStatus() == OrderStatus.DELETED) return;
             order.setStatus(OrderStatus.DELETED);
             order.setDeletedAt(LocalDateTime.now());
-            executeInTransaction(() -> {
+            inTransaction(() -> {
                 masterService.freeMaster(order.getMasterId());
                 garageSpotService.freeGarageSpot(order.getGarageSpotId());
                 if (!soft) {
@@ -76,9 +73,9 @@ public class OrderService {
         optionalOrder.ifPresent(order -> {
             if (order.getStatus() == OrderStatus.WORK_IN_PROGRESS) return;
             if (order.getStatus() == OrderStatus.CREATED) {
-                order.getActualWorkPeriod().setStart(LocalDateTime.now());
+                order.setActualWorkPeriod(new Period(LocalDateTime.now()));
             }
-            executeInTransaction(() -> {
+            inTransaction(() -> {
                 order.setStatus(OrderStatus.WORK_IN_PROGRESS);
                 orderRepository.save(order);
                 Optional<Master> optionalMaster = masterService.findById(order.getMasterId());
@@ -104,7 +101,7 @@ public class OrderService {
             }
             order.setStatus(OrderStatus.CLOSED);
             order.setClosedAt(LocalDateTime.now());
-            executeInTransaction(() -> {
+            inTransaction(() -> {
                 orderRepository.save(order);
                 masterService.freeMaster(order.getMasterId());
                 garageSpotService.freeGarageSpot(order.getGarageSpotId());
@@ -121,7 +118,7 @@ public class OrderService {
             }
             order.setStatus(OrderStatus.CANCELED);
             order.setCanceledAt(LocalDateTime.now());
-            executeInTransaction(() -> {
+            inTransaction(() -> {
                 orderRepository.save(order);
                 masterService.freeMaster(order.getMasterId());
                 garageSpotService.freeGarageSpot(order.getGarageSpotId());
@@ -137,7 +134,7 @@ public class OrderService {
         for (Order order : orders) {
             order.shiftEstimatedWorkPeriod(duration);
         }
-        executeInTransaction(() -> orderRepository.save(orders));
+        inTransaction(() -> orderRepository.save(orders));
     }
 
     public Optional<Order> findById(int id) {
@@ -175,27 +172,6 @@ public class OrderService {
     public void importFromPath(String path) {
         CsvImporter csvImporter = Container.INSTANCE.resolve(CsvImporter.class);
         List<Order> orders = csvImporter.importFromPath(path);
-        orderRepository.save(orders);
-    }
-
-    private void executeInTransaction(Runnable runnable) {
-        try {
-            connection.setAutoCommit(false);
-            runnable.run();
-            connection.commit();
-        } catch (DataAccessException | SQLException e) {
-            try {
-                connection.rollback();
-            } catch (SQLException ex) {
-                throw new ServiceException("Ошибка отката транзакции", ex);
-            }
-            throw new ServiceException("Ошибка транзакции", e);
-        } finally {
-            try {
-                connection.setAutoCommit(true);
-            } catch (SQLException e) {
-                System.out.println("Не удалось установить параметр автокоммита в true.");
-            }
-        }
+        inTransaction(() -> orderRepository.save(orders));
     }
 }

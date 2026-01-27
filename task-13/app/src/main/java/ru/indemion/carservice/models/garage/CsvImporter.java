@@ -25,7 +25,7 @@ public class CsvImporter extends AbstractCsvImporter<GarageSpot> {
         String[] fields = str.split(CSV_SEPARATOR, -1);
         int id = Integer.parseInt(fields[0]);
         int number = Integer.parseInt(fields[1]);
-        GarageSpotStatus status = GarageSpotStatus.valueOf(fields[2]);
+        GarageSpotStatus status = GarageSpotStatus.parse(fields[2]);
         Order orderAtWork = null;
         if (!fields[3].isEmpty()) {
             Optional<Order> optionalOrder = orderService.findById(Integer.parseInt(fields[3]));

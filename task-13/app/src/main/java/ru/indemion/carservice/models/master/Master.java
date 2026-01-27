@@ -1,38 +1,69 @@
 package ru.indemion.carservice.models.master;
 
-import ru.indemion.carservice.dao.MasterDTO;
-import ru.indemion.carservice.models.Model;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import ru.indemion.carservice.models.IHasId;
 import ru.indemion.carservice.models.order.Order;
 
-public class Master extends Model {
-    private final String firstname;
-    private final String lastname;
+import java.util.List;
+
+@Entity
+@Table(name = "masters")
+public class Master implements IHasId {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+    private String firstname;
+    private String lastname;
+    @Convert(converter = MasterStatusConverter.class)
     private MasterStatus status;
+    @Column(name = "order_at_work_id", insertable = false, updatable = false)
     private Integer orderAtWorkId;
-    private transient Order orderAtWork;
+    @OneToOne(fetch = FetchType.LAZY, targetEntity = Order.class)
+    @JoinColumn(name = "order_at_work_id")
+    private Order orderAtWork;
+    @OneToMany(mappedBy = "master")
+    private List<Order> orders;
+
+    public Master() {
+    }
 
     public Master(String firstname, String lastname) {
-        super(0);
         this.firstname = firstname;
         this.lastname = lastname;
         this.status = MasterStatus.FREE;
     }
 
     public Master(int id, String firstname, String lastname, MasterStatus status, Order orderAtWork) {
-        super(id);
+        this.id = id;
         this.firstname = firstname;
         this.lastname = lastname;
         this.status = status;
-        this.orderAtWorkId = orderAtWork.getId();
         this.orderAtWork = orderAtWork;
     }
 
     public Master(int id, String firstname, String lastname, MasterStatus status, Integer orderAtWorkId) {
-        super(id);
+        this.id = id;
         this.firstname = firstname;
         this.lastname = lastname;
         this.status = status;
-        this.orderAtWorkId = orderAtWorkId;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getFirstname() {
@@ -41,10 +72,6 @@ public class Master extends Model {
 
     public String getLastname() {
         return lastname;
-    }
-
-    public String getFullname() {
-        return firstname + " " + lastname;
     }
 
     public MasterStatus getStatus() {
@@ -61,25 +88,17 @@ public class Master extends Model {
 
     public void setOrderAtWork(Order orderAtWork) {
         this.orderAtWork = orderAtWork;
-        this.orderAtWorkId = orderAtWork == null ? null : orderAtWork.getId();
         this.status = orderAtWork == null ? MasterStatus.FREE : MasterStatus.BUSY;
-    }
-
-    public boolean isBusy() {
-        return status == MasterStatus.BUSY;
     }
 
     @Override
     public String toString() {
-        return String.format("""
-                Master:
-                 - id: %d
-                 - firstname: %s
-                 - lastname: %s
-                 - status: %s""", id, firstname, lastname, status);
-    }
-
-    public MasterDTO toEntity() {
-        return new MasterDTO(id, firstname, lastname, status.toString(), orderAtWorkId);
+        return "Master{" +
+                "id=" + id +
+                ", firstname='" + firstname + '\'' +
+                ", lastname='" + lastname + '\'' +
+                ", status=" + status +
+                ", orderAtWorkId=" + orderAtWorkId +
+                '}';
     }
 }

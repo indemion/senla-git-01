@@ -1,11 +1,14 @@
 package ru.indemion.carservice.common;
 
+import jakarta.persistence.Embeddable;
+
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Objects;
+//import java.util.Objects;
 
+@Embeddable
 public class Period implements Serializable {
     private LocalDateTime start;
     private LocalDateTime end;
@@ -18,10 +21,10 @@ public class Period implements Serializable {
     }
 
     public Period(LocalDateTime start, LocalDateTime end) {
-        if (Objects.isNull(start) || Objects.isNull(end)) {
-            throw new RuntimeException("Начало и конец периода не могут быть null");
-        }
-        if (start.isAfter(end)) throw new IllegalArgumentException(start + " after " + end);
+//        if (Objects.isNull(start) || Objects.isNull(end)) {
+//            throw new RuntimeException("Начало и конец периода не могут быть null");
+//        }
+//        if (start.isAfter(end)) throw new IllegalArgumentException(start + " after " + end);
         this.start = start;
         this.end = end;
     }

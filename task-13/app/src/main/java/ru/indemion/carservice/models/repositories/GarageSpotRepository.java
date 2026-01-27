@@ -9,8 +9,6 @@ import java.util.Optional;
 
 public interface GarageSpotRepository extends Repository<GarageSpot> {
     Optional<GarageSpot> findByNumber(int number);
-
     List<GarageSpot> findFreeGarageSpotsInPeriod(Period period);
-
     List<GarageSpot> findFilteredByStatus(GarageSpotStatus status);
 }
