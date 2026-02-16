@@ -1,6 +1,7 @@
 package ru.indemion.carservice;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import ru.indemion.carservice.config.AppConfig;
 import ru.indemion.carservice.ui.controllers.ConsoleController;
 
 public class Main {

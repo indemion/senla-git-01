@@ -1,7 +1,7 @@
 package ru.indemion.carservice.ui.controllers;
 
 import org.springframework.stereotype.Component;
-import ru.indemion.carservice.AppConfig;
+import ru.indemion.carservice.config.AppConfig;
 import ru.indemion.carservice.common.OperationProhibitedMessages;
 import ru.indemion.carservice.exceptions.OperationProhibitedException;
 import ru.indemion.carservice.models.garage.GarageSpotCsvExporter;
