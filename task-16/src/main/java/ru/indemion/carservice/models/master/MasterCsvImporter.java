@@ -26,7 +26,7 @@ public class MasterCsvImporter extends AbstractCsvImporter<Master> {
         int id = Integer.parseInt(fields[0]);
         String firstname = fields[1];
         String lastname = fields[2];
-        MasterStatus status = MasterStatus.valueOf(fields[3]);
+        MasterStatus status = MasterStatus.parse(fields[3]);
         Order orderAtWork = null;
         if (!fields[4].isEmpty()) {
             Optional<Order> optionalOrder = orderRepository.findById(Integer.parseInt(fields[4]));

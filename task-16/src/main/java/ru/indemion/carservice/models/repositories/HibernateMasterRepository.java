@@ -8,12 +8,12 @@ import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
+import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
 import ru.indemion.carservice.common.Period;
 import ru.indemion.carservice.models.master.FilterParams;
 import ru.indemion.carservice.models.master.Master;
 import ru.indemion.carservice.models.master.SortParams;
-import ru.indemion.carservice.util.HibernateUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,13 +21,13 @@ import java.util.Optional;
 
 @Repository
 public class HibernateMasterRepository extends HibernateAbstractRepository<Master> implements MasterRepository {
-    public HibernateMasterRepository() {
-        super(HibernateUtil.getCurrentSession(), Master.class);
+    public HibernateMasterRepository(SessionFactory sessionFactory) {
+        super(sessionFactory, Master.class);
     }
 
     @Override
     public List<Master> findFilteredAndSorted(FilterParams filterParams, SortParams sortParams) {
-        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaBuilder cb = getCurrentSession().getCriteriaBuilder();
         CriteriaQuery<Master> cq = cb.createQuery(entityClass);
         Root<Master> masterRoot = cq.from(entityClass);
         cq.select(masterRoot);
@@ -42,6 +42,9 @@ public class HibernateMasterRepository extends HibernateAbstractRepository<Maste
             List<Order> orderList = new ArrayList<>();
             List<Path<?>> pathList = new ArrayList<>();
             switch (sortParams.getSortCriteria()) {
+                case ID -> {
+                    pathList.add(masterRoot.get("id"));
+                }
                 case FULLNAME -> {
                     pathList.add(masterRoot.get("firstname"));
                     pathList.add(masterRoot.get("lastname"));
@@ -55,7 +58,7 @@ public class HibernateMasterRepository extends HibernateAbstractRepository<Maste
             cq.orderBy(orderList);
         }
 
-        return session.createQuery(cq).getResultList();
+        return getCurrentSession().createQuery(cq).getResultList();
     }
 
     @Override
@@ -65,7 +68,7 @@ public class HibernateMasterRepository extends HibernateAbstractRepository<Maste
 
     @Override
     public List<Master> findMastersFreeInPeriod(Period period) {
-        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaBuilder cb = getCurrentSession().getCriteriaBuilder();
         CriteriaQuery<Master> cq = cb.createQuery(entityClass);
         Root<Master> masterRoot = cq.from(entityClass);
 
@@ -79,17 +82,17 @@ public class HibernateMasterRepository extends HibernateAbstractRepository<Maste
                 );
         cq.select(masterRoot).where(cb.not(cb.exists(orderSubquery)));
 
-        return session.createQuery(cq).getResultList();
+        return getCurrentSession().createQuery(cq).getResultList();
     }
 
     @Override
     public Optional<Master> findByOrderId(int orderId) {
-        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaBuilder cb = getCurrentSession().getCriteriaBuilder();
         CriteriaQuery<Master> cq = cb.createQuery(entityClass);
         Root<Master> masterRoot = cq.from(entityClass);
         Join<Master, ru.indemion.carservice.models.order.Order> orderJoin = masterRoot.join("orders", JoinType.INNER);
         cq.where(cb.equal(orderJoin.get("id"), orderId));
 
-        return Optional.ofNullable(session.createQuery(cq).getSingleResult());
+        return Optional.ofNullable(getCurrentSession().createQuery(cq).getSingleResult());
     }
 }

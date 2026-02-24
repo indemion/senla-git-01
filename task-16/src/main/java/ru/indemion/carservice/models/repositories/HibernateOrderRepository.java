@@ -5,24 +5,24 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
 import ru.indemion.carservice.models.order.FilterParams;
 import ru.indemion.carservice.models.order.Order;
 import ru.indemion.carservice.models.order.SortParams;
-import ru.indemion.carservice.util.HibernateUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Repository
 public class HibernateOrderRepository extends HibernateAbstractRepository<Order> implements OrderRepository {
-    public HibernateOrderRepository() {
-        super(HibernateUtil.getCurrentSession(), Order.class);
+    public HibernateOrderRepository(SessionFactory sessionFactory) {
+        super(sessionFactory, Order.class);
     }
 
     @Override
     public List<Order> findFilteredAndSorted(FilterParams filterParams, SortParams sortParams) {
-        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaBuilder cb = getCurrentSession().getCriteriaBuilder();
         CriteriaQuery<Order> cq = cb.createQuery(entityClass);
         Root<Order> orderRoot = cq.from(entityClass);
         cq.select(orderRoot);
@@ -61,6 +61,6 @@ public class HibernateOrderRepository extends HibernateAbstractRepository<Order>
             cq.orderBy(orderList);
         }
 
-        return session.createQuery(cq).getResultList();
+        return getCurrentSession().createQuery(cq).getResultList();
     }
 }

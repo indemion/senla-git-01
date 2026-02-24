@@ -1,26 +1,31 @@
 package ru.indemion.carservice.models.repositories;
 
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import ru.indemion.carservice.models.IHasId;
 
 import java.util.List;
 import java.util.Optional;
 
 public class HibernateAbstractRepository<T extends IHasId> implements Repository<T> {
-    protected final Session session;
+    protected final SessionFactory sessionFactory;
     protected final Class<T> entityClass;
 
-    public HibernateAbstractRepository(Session session, Class<T> entityClass) {
-        this.session = session;
+    public HibernateAbstractRepository(SessionFactory sessionFactory, Class<T> entityClass) {
+        this.sessionFactory = sessionFactory;
         this.entityClass = entityClass;
+    }
+
+    public Session getCurrentSession() {
+        return sessionFactory.getCurrentSession();
     }
 
     public T save(T entity) {
         if (entity.getId() == 0) {
-            session.persist(entity);
-            session.flush();
+            getCurrentSession().persist(entity);
+            getCurrentSession().flush();
         } else {
-            session.merge(entity);
+            getCurrentSession().merge(entity);
         }
         return entity;
     }
@@ -30,15 +35,15 @@ public class HibernateAbstractRepository<T extends IHasId> implements Repository
     }
 
     public void delete(T entity) {
-        session.remove(entity);
+        getCurrentSession().remove(entity);
     }
 
     public Optional<T> findById(int id) {
-        T entity = session.find(entityClass, id);
+        T entity = getCurrentSession().find(entityClass, id);
         return entity != null ? Optional.of(entity) : Optional.empty();
     }
 
     public List<T> findAll() {
-        return session.createQuery("FROM " + entityClass.getName(), entityClass).getResultList();
+        return getCurrentSession().createQuery("FROM " + entityClass.getName(), entityClass).getResultList();
     }
 }

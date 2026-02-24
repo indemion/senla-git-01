@@ -42,6 +42,11 @@ public final class FilterParams {
             return this;
         }
 
+        public Builder statuses(List<OrderStatus> statuses) {
+            this.statuses.addAll(statuses);
+            return this;
+        }
+
         public Builder masterId(Integer masterId) {
             this.masterId = masterId;
             return this;

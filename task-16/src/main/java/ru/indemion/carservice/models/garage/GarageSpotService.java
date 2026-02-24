@@ -1,85 +1,28 @@
 package ru.indemion.carservice.models.garage;
 
-import org.springframework.stereotype.Service;
-import ru.indemion.carservice.config.AppConfig;
-import ru.indemion.carservice.common.OperationProhibitedMessages;
+import org.springframework.web.multipart.MultipartFile;
 import ru.indemion.carservice.common.Period;
-import ru.indemion.carservice.exceptions.OperationProhibitedException;
-import ru.indemion.carservice.models.repositories.GarageSpotRepository;
-import ru.indemion.carservice.models.services.AbstractTransactionalService;
-import ru.indemion.carservice.util.HibernateUtil;
+import ru.indemion.carservice.common.SortParams;
+import ru.indemion.carservice.dto.CreateGarageSpotDto;
+import ru.indemion.carservice.dto.GarageSpotDto;
 
 import java.util.List;
 import java.util.Optional;
 
-@Service
-public class GarageSpotService extends AbstractTransactionalService {
-    private final GarageSpotRepository garageSpotRepository;
-    private final AppConfig appConfig;
-    private final GarageSpotCsvExporter csvExporter;
-    private final GarageSpotCsvImporter csvImporter;
-
-    public GarageSpotService(GarageSpotRepository garageSpotRepository,
-                             AppConfig appConfig, GarageSpotCsvExporter csvExporter, GarageSpotCsvImporter csvImporter) {
-        super(HibernateUtil.getCurrentSession());
-        this.garageSpotRepository = garageSpotRepository;
-        this.appConfig = appConfig;
-        this.csvExporter = csvExporter;
-        this.csvImporter = csvImporter;
-    }
-
-    public GarageSpot create(int number) {
-        Optional<GarageSpot> optionalGarageSpot = findByNumber(number);
-        return optionalGarageSpot.orElseGet(() -> inTransaction(() -> garageSpotRepository.save(new GarageSpot(number))));
-    }
-
-    public void save(GarageSpot garageSpot) {
-        garageSpotRepository.save(garageSpot);
-    }
-
-    public void delete(int id) {
-        if (!appConfig.isGarageSpotRemovable()) {
-            throw new OperationProhibitedException(OperationProhibitedMessages.GARAGE_SPOT_REMOVING);
-        }
-
-        Optional<GarageSpot> optionalGarageSpot = garageSpotRepository.findByNumber(id);
-        optionalGarageSpot.ifPresent(garageSpot -> inTransaction(() -> garageSpotRepository.delete(garageSpot)));
-    }
-
-    public List<GarageSpot> getFreeGarageSpotsInPeriod(Period period) {
-        return garageSpotRepository.findFreeGarageSpotsInPeriod(period);
-    }
-
-    public Optional<GarageSpot> findById(int id) {
-        return garageSpotRepository.findById(id);
-    }
-
-    public Optional<GarageSpot> findByNumber(int number) {
-        return garageSpotRepository.findByNumber(number);
-    }
-
-    public List<GarageSpot> getGarageSpots() {
-        return garageSpotRepository.findAll();
-    }
-
-    public List<GarageSpot> getGarageSpotsByStatus(GarageSpotStatus status) {
-        return garageSpotRepository.findFilteredByStatus(status);
-    }
-
-    public void freeGarageSpot(int garageSpotId) {
-        Optional<GarageSpot> optionalGarageSpot = garageSpotRepository.findById(garageSpotId);
-        optionalGarageSpot.ifPresent(garageSpot -> {
-            garageSpot.setOrderAtWork(null);
-            garageSpotRepository.save(garageSpot);
-        });
-    }
-
-    public String exportToPath(String path) {
-        return csvExporter.exportToPath(path, getGarageSpots());
-    }
-
-    public void importFromPath(String path) {
-        List<GarageSpot> garageSpots = csvImporter.importFromPath(path);
-        inTransaction(() -> garageSpotRepository.save(garageSpots));
-    }
+public interface GarageSpotService {
+    GarageSpot create(int number);
+    void save(GarageSpot garageSpot);
+    void delete(int id);
+    List<GarageSpot> getFreeGarageSpotsInPeriod(Period period);
+    Optional<GarageSpot> findById(int id);
+    Optional<GarageSpot> findByNumber(int number);
+    List<GarageSpot> getGarageSpots();
+    List<GarageSpot> getGarageSpotsByStatus(GarageSpotStatus status);
+    void freeGarageSpot(int garageSpotId);
+    String exportToPath(String path);
+    void importFromPath(String path);
+    List<GarageSpotDto> findAll(FilterParams filterParams, SortParams<SortCriteria> sortParams);
+    GarageSpotDto create(CreateGarageSpotDto createGarageSpotDto);
+    String getCsvData();
+    void importCsv(MultipartFile file);
 }
