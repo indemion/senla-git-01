@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: 11
+      author: indemion
+      changes:
+        - sqlFile:
+            path: db/changelog/data/initial-data.sql
+            relativeToChangelogFile: false
+            splitStatements: true
+            endDelimiter: ;

@@ -1,0 +1,11 @@
+services:
+  postgres:
+    image: postgres:17
+    restart: always
+    container_name: senlatask11
+    environment:
+      POSTGRES_DB: "senlatask11"
+      POSTGRES_USER: "testpguser"
+      POSTGRES_PASSWORD: "testpgpwd"
+    ports:
+      - "5432:5432"

@@ -1,0 +1,28 @@
+databaseChangeLog:
+  - changeSet:
+      id: 8
+      author: indemion
+      changes:
+        - sqlFile:
+            path: db/changelog/shared/functions/get-free-garage-spot-id-in-period-function.sql
+            relativeToChangelogFile: false
+            splitStatements: false
+            endDelimiter: ;
+  - changeSet:
+      id: 9
+      author: indemion
+      changes:
+        - sqlFile:
+            path: db/changelog/shared/functions/get-free-master-id-in-period-function.sql
+            relativeToChangelogFile: false
+            splitStatements: false
+            endDelimiter: ;
+  - changeSet:
+      id: 10
+      author: indemion
+      changes:
+        - sqlFile:
+            path: db/changelog/shared/procedures/fill-orders-random-data-procedure.sql
+            relativeToChangelogFile: false
+            splitStatements: false
+            endDelimiter: ;
