@@ -1,0 +1,32 @@
+services:
+  carservice:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+
+  postgres:
+    image: postgres:17
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U senlatask11" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    container_name: senlatask11
+    environment:
+      POSTGRES_DB: "senlatask11"
+      POSTGRES_USER: "testpguser"
+      POSTGRES_PASSWORD: "testpgpwd"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

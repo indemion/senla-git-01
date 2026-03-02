@@ -1,0 +1,10 @@
+.git/
+.idea/
+.gigaide/
+logs/
+target/
+*.iml
+.gitignore
+*.bat
+compose.yaml
+Dockerfile

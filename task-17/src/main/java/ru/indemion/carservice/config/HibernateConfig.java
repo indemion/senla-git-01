@@ -28,7 +28,7 @@ public class HibernateConfig {
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("org.postgresql.Driver");
-        dataSource.setUrl("jdbc:postgresql://localhost:5432/senlatask11");
+        dataSource.setUrl("jdbc:postgresql://postgres:5432/senlatask11");
         dataSource.setUsername("testpguser");
         dataSource.setPassword("testpgpwd");
         return dataSource;
@@ -46,7 +46,7 @@ public class HibernateConfig {
         properties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
         properties.setProperty("hibernate.show_sql", "true");
         properties.setProperty("hibernate.format_sql", "true");
-        properties.setProperty("hibernate.hbm2ddl.auto", "update");
+        properties.setProperty("hibernate.hbm2ddl.auto", "none");
         properties.setProperty("hibernate.generate_statistics", "false");
         return properties;
     }
