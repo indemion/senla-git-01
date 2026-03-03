@@ -1,0 +1,39 @@
+services:
+  carservice:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:8080/health || exit 1" ]
+      interval: 10s
+      retries: 5
+      start_period: 10s
+      timeout: 10s
+    depends_on:
+      postgres:
+        condition: service_healthy
+        restart: true
+    ports:
+      - "8080:8080"
+
+  postgres:
+    image: postgres:17
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "psql -U $${POSTGRES_USER} -d $${POSTGRES_DB} -c 'SELECT 1'"]
+      interval: 10s
+      retries: 5
+      start_period: 10s
+      timeout: 10s
+    environment:
+      POSTGRES_DB: "carservice"
+      POSTGRES_USER: "carservice_admin"
+      POSTGRES_PASSWORD: "carservice_pwd"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
