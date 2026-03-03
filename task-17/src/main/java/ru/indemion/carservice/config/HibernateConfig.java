@@ -28,9 +28,9 @@ public class HibernateConfig {
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("org.postgresql.Driver");
-        dataSource.setUrl("jdbc:postgresql://postgres:5432/senlatask11");
-        dataSource.setUsername("testpguser");
-        dataSource.setPassword("testpgpwd");
+        dataSource.setUrl("jdbc:postgresql://postgres:5432/carservice");
+        dataSource.setUsername("carservice_admin");
+        dataSource.setPassword("carservice_pwd");
         return dataSource;
     }
 

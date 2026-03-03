@@ -38,7 +38,9 @@ ENV LANGUAGE=en_US:en \
     JAVA_HOME=/opt/java/openjdk \
     TOMCAT_NATIVE_LIBDIR=/usr/local/tomcat/native-jni-lib \
     CATALINA_HOME=/usr/local/tomcat \
-    PATH=/usr/local/tomcat/bin:/opt/java/openjdk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    PATH=/usr/local/tomcat/bin:/opt/java/openjdk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+    \
+    CATALINA_OPTS="-Dorg.apache.catalina.startup.EXIT_ON_INIT_FAILURE=true"
 
 COPY --from=prepare / /
 
