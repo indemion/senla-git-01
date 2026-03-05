@@ -3,6 +3,7 @@ package ru.indemion.carservice.config;
 import org.hibernate.SessionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.hibernate.HibernateTransactionManager;
 import org.springframework.orm.jpa.hibernate.LocalSessionFactoryBean;
@@ -15,6 +16,12 @@ import java.util.Properties;
 @Configuration
 @EnableTransactionManagement
 public class HibernateConfig {
+    private final Environment environment;
+
+    public HibernateConfig(Environment environment) {
+        this.environment = environment;
+    }
+
     @Bean
     public LocalSessionFactoryBean sessionFactory() {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
@@ -28,9 +35,9 @@ public class HibernateConfig {
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("org.postgresql.Driver");
-        dataSource.setUrl("jdbc:postgresql://postgres:5432/carservice");
-        dataSource.setUsername("carservice_admin");
-        dataSource.setPassword("carservice_pwd");
+        dataSource.setUrl(environment.getProperty("DATASOURCE_URL"));
+        dataSource.setUsername(environment.getProperty("DATASOURCE_USERNAME"));
+        dataSource.setPassword(environment.getProperty("DATASOURCE_PASSWORD"));
         return dataSource;
     }
 
