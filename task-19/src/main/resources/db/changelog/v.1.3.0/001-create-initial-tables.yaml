@@ -1,0 +1,121 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: indemion
+      changes:
+        - createTable:
+            tableName: garage_spots
+            columns:
+              - column:
+                  name: id
+                  type: INTEGER
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: number
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR
+                  constraints:
+                    nullable: false
+                    checkConstraint: "status IN ('free', 'occupied')"
+              - column:
+                  name: order_at_work_id
+                  type: INTEGER
+  - changeSet:
+      id: 2
+      author: indemion
+      changes:
+        - createTable:
+            tableName: masters
+            columns:
+              - column:
+                  name: id
+                  type: INTEGER
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: firstname
+                  type: VARCHAR
+                  constraints:
+                    nullable: false
+              - column:
+                  name: lastname
+                  type: VARCHAR
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR
+                  constraints:
+                    nullable: false
+                    checkConstraint: "status IN ('free', 'busy')"
+              - column:
+                  name: order_at_work_id
+                  type: INTEGER
+  - changeSet:
+      id: 3
+      author: indemion
+      changes:
+        - createTable:
+            tableName: orders
+            columns:
+              - column:
+                  name: id
+                  type: INTEGER
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: price
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+              - column:
+                  name: master_id
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+              - column:
+                  name: garage_spot_id
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR
+                  constraints:
+                    nullable: false
+                    checkConstraint: "status IN ('created', 'work_in_progress', 'closed', 'canceled', 'deleted')"
+              - column:
+                  name: estimated_work_period_start
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: estimated_work_period_end
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: actual_work_period_start
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: actual_work_period_end
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: closed_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: canceled_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
