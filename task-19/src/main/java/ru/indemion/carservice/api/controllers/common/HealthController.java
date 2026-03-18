@@ -1,4 +1,4 @@
-package ru.indemion.carservice.api.controllers;
+package ru.indemion.carservice.api.controllers.common;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
