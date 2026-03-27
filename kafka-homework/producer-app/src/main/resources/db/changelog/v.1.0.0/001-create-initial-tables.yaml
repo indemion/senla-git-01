@@ -1,0 +1,79 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: indemion
+      changes:
+        - createTable:
+            tableName: bank_accounts
+            columns:
+              - column:
+                  name: id
+                  type: INTEGER
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: balance
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 2
+      author: indemion
+      changes:
+        - createTable:
+            tableName: transfers
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: from_bank_account_id
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+              - column:
+                  name: to_bank_account_id
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+              - column:
+                  name: amount
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 3
+      author: indemion
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: from_bank_account_id
+            baseTableName: transfers
+            constraintName: fk_bank_accounts_from_bank_account_id
+            onDelete: CASCADE
+            onUpdate: CASCADE
+            referencedColumnNames: id
+            referencedTableName: bank_accounts
+            validate: true
+  - changeSet:
+      id: 4
+      author: indemion
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: to_bank_account_id
+            baseTableName: transfers
+            constraintName: fk_bank_accounts_to_bank_account_id
+            onDelete: CASCADE
+            onUpdate: CASCADE
+            referencedColumnNames: id
+            referencedTableName: bank_accounts
+            validate: true
