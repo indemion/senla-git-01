@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: 18
+      author: indemion
+      changes:
+        - sqlFile:
+            path: db/changelog/data/users-and-roles.sql
+            relativeToChangelogFile: false
+            splitStatements: true
+            endDelimiter: ;

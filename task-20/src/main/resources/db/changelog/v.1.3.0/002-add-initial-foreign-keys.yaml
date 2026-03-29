@@ -1,0 +1,53 @@
+databaseChangeLog:
+  - changeSet:
+      id: 4
+      author: indemion
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: order_at_work_id
+            baseTableName: garage_spots
+            constraintName: fk_garage_spots_order_at_work_id
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: orders
+            validate: true
+  - changeSet:
+      id: 5
+      author: indemion
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: order_at_work_id
+            baseTableName: masters
+            constraintName: fk_masters_order_at_work_id
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: orders
+            validate: true
+  - changeSet:
+      id: 6
+      author: indemion
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: garage_spot_id
+            baseTableName: orders
+            constraintName: fk_orders_garage_spot_id
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: garage_spots
+            validate: true
+  - changeSet:
+      id: 7
+      author: indemion
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: master_id
+            baseTableName: orders
+            constraintName: fk_orders_master_id
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: masters
+            validate: true

@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: v.1.3.0/master.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: v.1.5.0/master.yaml
+      relativeToChangelogFile: true
