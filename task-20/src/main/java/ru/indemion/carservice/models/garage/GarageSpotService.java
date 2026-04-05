@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface GarageSpotService {
-    GarageSpot create(int number);
+    GarageSpot createOrGet(int number);
     void save(GarageSpot garageSpot);
     void delete(int id);
     List<GarageSpot> getFreeGarageSpotsInPeriod(Period period);
@@ -22,7 +22,7 @@ public interface GarageSpotService {
     String exportToPath(String path);
     void importFromPath(String path);
     List<GarageSpotDto> findAll(FilterParams filterParams, SortParams<SortCriteria> sortParams);
-    GarageSpotDto create(CreateGarageSpotDto createGarageSpotDto);
+    GarageSpotDto createOrGet(CreateGarageSpotDto createGarageSpotDto);
     String getCsvData();
     void importCsv(MultipartFile file);
 }

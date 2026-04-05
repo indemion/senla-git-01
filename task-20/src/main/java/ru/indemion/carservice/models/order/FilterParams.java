@@ -3,6 +3,7 @@ package ru.indemion.carservice.models.order;
 import ru.indemion.carservice.common.Period;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public final class FilterParams {
@@ -33,7 +34,7 @@ public final class FilterParams {
     }
 
     public static class Builder {
-        private List<OrderStatus> statuses;
+        private List<OrderStatus> statuses = new LinkedList<>();
         private Integer masterId;
         private Period estimatedWorkStartInPeriod;
 

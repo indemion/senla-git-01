@@ -75,7 +75,9 @@ public class Order implements IHasId {
     public Order(int price, Master master, GarageSpot garageSpot, Period estimatedWorkPeriod) {
         this.price = price;
         this.master = master;
+        this.masterId = master.getId();
         this.garageSpot = garageSpot;
+        this.garageSpotId = garageSpot.getId();
         this.status = OrderStatus.CREATED;
         this.estimatedWorkPeriod = estimatedWorkPeriod;
         this.actualWorkPeriod = new Period();
@@ -89,7 +91,9 @@ public class Order implements IHasId {
         this.price = price;
         this.status = status;
         this.master = master;
+        this.masterId = master.getId();
         this.garageSpot = garageSpot;
+        this.garageSpotId = garageSpot.getId();
         this.estimatedWorkPeriod = estimatedWorkPeriod;
         this.actualWorkPeriod = actualWorkPeriod;
         this.createdAt = createdAt;
@@ -148,6 +152,10 @@ public class Order implements IHasId {
 
     public LocalDateTime getClosedAt() {
         return closedAt;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public void setActualWorkPeriod(Period actualWorkPeriod) {

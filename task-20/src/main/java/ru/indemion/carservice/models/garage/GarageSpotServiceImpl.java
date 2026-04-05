@@ -35,9 +35,8 @@ public class GarageSpotServiceImpl implements GarageSpotService {
     }
 
     @Override
-    public GarageSpot create(int number) {
-        Optional<GarageSpot> optionalGarageSpot = findByNumber(number);
-        return optionalGarageSpot.orElseGet(() -> garageSpotRepository.save(new GarageSpot(number)));
+    public GarageSpot createOrGet(int number) {
+        return findByNumber(number).orElseGet(() -> garageSpotRepository.save(new GarageSpot(number)));
     }
 
     @Override
@@ -107,10 +106,8 @@ public class GarageSpotServiceImpl implements GarageSpotService {
     }
 
     @Override
-    public GarageSpotDto create(CreateGarageSpotDto createGarageSpotDto) {
-        Optional<GarageSpot> optionalGarageSpot = findByNumber(createGarageSpotDto.getNumber());
-        return convertEntityToDto(optionalGarageSpot.orElseGet(() ->
-                garageSpotRepository.save(new GarageSpot(createGarageSpotDto.getNumber()))));
+    public GarageSpotDto createOrGet(CreateGarageSpotDto createGarageSpotDto) {
+        return convertEntityToDto(createOrGet(createGarageSpotDto.getNumber()));
     }
 
     @Override

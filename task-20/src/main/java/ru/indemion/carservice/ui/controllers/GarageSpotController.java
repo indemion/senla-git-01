@@ -61,7 +61,7 @@ public class GarageSpotController {
         operationLogger.log("создание гаражного места", () -> {
             System.out.print("Введите номер гаражного места: ");
             int number = scanner.nextInt();
-            garageSpotView.show(garageSpotService.create(number));
+            garageSpotView.show(garageSpotService.createOrGet(number));
         });
     }
 

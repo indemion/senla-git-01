@@ -46,7 +46,7 @@ public class GarageSpotApiController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public GarageSpotDto create(@RequestBody CreateGarageSpotDto createGarageSpotDto) {
-        return garageSpotService.create(createGarageSpotDto);
+        return garageSpotService.createOrGet(createGarageSpotDto);
     }
 
     @DeleteMapping("/{id}")
