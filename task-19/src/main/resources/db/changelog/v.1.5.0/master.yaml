@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - include:
+      file: 005-create-users-and-roles-tables.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: 006-add-foreign-keys.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: 007-seed-users-and-roles.yaml
+      relativeToChangelogFile: true
