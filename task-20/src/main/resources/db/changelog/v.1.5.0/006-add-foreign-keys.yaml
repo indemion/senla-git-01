@@ -1,0 +1,25 @@
+databaseChangeLog:
+  - changeSet:
+      id: 16
+      author: indemion
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: user_roles
+            baseColumnNames: user_id
+            constraintName: fk_user_roles_users
+            referencedColumnNames: id
+            referencedTableName: users
+            onDelete: CASCADE
+            validate: true
+  - changeSet:
+      id: 17
+      author: indemion
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: user_roles
+            baseColumnNames: role_id
+            constraintName: fk_user_roles_roles
+            referencedColumnNames: id
+            referencedTableName: roles
+            onDelete: CASCADE
+            validate: true
